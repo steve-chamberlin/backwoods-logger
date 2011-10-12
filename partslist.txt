@@ -1,0 +1,40 @@
+LOGGER CLASSIC PARTS LIST
+
+Quantity Part                      Purpose                  Supplier   Price     Ext Price     URL
+1        ATmega328P                microcontroller          Digi-Key    $3.93     $3.93        http://search.digikey.com/scripts/DkSearch/dksus.dll?Detail&name=ATMEGA328-PU-ND
+1        BMP085 breakout           pressure sensor          Sparkfun   $19.95    $19.95        http://www.sparkfun.com/products/9694
+1        Nokia 5110 breakout       84 x 48 display          Sparkfun    $9.95     $9.95        http://www.sparkfun.com/products/10168
+1        Murata PKM13EPYH4002      buzzer                   Digi-Key    $0.87     $0.87        http://search.digikey.com/scripts/DkSearch/dksus.dll?vendor=0&keywords=Murata+PKM13EPYH4002
+1        32768 Hz crystal 6 pF     crystal oscillator       Digi-Key    $0.32     $0.32        http://search.digikey.com/scripts/DkSearch/dksus.dll?Detail&name=SER3205-ND
+3        B3F-1020                  tactile switch           Digi-Key    $0.35     $1.05        http://search.digikey.com/scripts/DkSearch/dksus.dll?Detail&name=SW402-ND
+1        BC2032-E2                 CR2032 battery holder    Digi-Key    $0.62     $0.62        http://search.digikey.com/scripts/DkSearch/dksus.dll?Detail&name=BC2032-E2-ND
+3        0.1uF ceramic             through-hole capacitor      
+1        22uF electrolytic         through-hole capacitor      
+1        510 ohm through-hole      resistor      
+1        1K ohm through-hole       resistor      
+20       female 0.1 inch header    connector      
+20       male 0.1 inch header      connector      
+
+
+
+LOGGER MINI PARTS LIST
+
+Quantity Part                      Purpose                          Supplier    Price     Ext Price     URL
+1        ATmega328P-AU             microcontroller                  Digi-Key    $4.87     $4.87         http://search.digikey.com/scripts/dksearch/dksus.dll?pname&WT.z_cid=ref_octopart_dkc_buynow&site=us&lang=en&name=ATMEGA328P-AU-ND
+1        MAX1675EUA+               voltage regulator                Digi-Key    $5.73     $5.73         http://search.digikey.com/scripts/DkSearch/dksus.dll?Detail&name=MAX1675EUA%2B-ND
+1        BMP085                    pressure sensor                  Digi-Key    $7.89     $7.89         http://search.digikey.com/scripts/dksearch/dksus.dll?Detail&name=828-1005-1-ND
+1        UG-2864HSWEG01            128x64 OLED display              eBay        $12.99@2  $6.50@1       http://www.ebay.com/itm/OLED-LCD-LED-Display-Module-white-0-96-128x64-dot-2pcs-/180729485266?pt=LH_DefaultDomain_0&hash=item2a145117d2
+1        Graphic OLED display      alt. display supplier: untested  SparkFun    $14.95    $14.95        http://www.sparkfun.com/products/10133
+1        CCV-084B16                buzzer                           Digi-Key    $2.36     $2.36         http://search.digikey.com/scripts/dksearch/dksus.dll?Detail&name=102-1265-1-ND
+1        SQ-SEN-200                vibration sensor (OPTIONAL)      SignalQuest N/A       N/A           http://www.signalquest.com/sq-sen-200.htm
+1        32768 Hz crystal 6 pF     crystal oscillator               Digi-Key    $0.32     $0.32         http://search.digikey.com/scripts/DkSearch/dksus.dll?Detail&name=SER3205-ND
+1        UP1B-220-R                inductor                         Digi-Key    $1.38     $1.38         http://search.digikey.com/scripts/dksearch/dksus.dll?Detail&name=513-1069-1-ND
+1        MBR0520L                  Schottky diode                   Digi-Key    $0.63     $0.63         http://search.digikey.com/scripts/dksearch/dksus.dll?pname&WT.z_cid=ref_octopart_dkc_buynow&site=us&lang=en&name=MBR0520LCT-ND
+3        B3FS-1010                 tactile switch                   Digi-Key    $0.65     $1.95         http://search.digikey.com/scripts/dksearch/dksus.dll?pname&WT.z_cid=ref_octopart_dkc_buynow&site=us&lang=en&name=SW1141-ND
+1        2466K-ND                  AAA battery holder               Digi-Key    $1.45     $1.45         http://search.digikey.com/scripts/dksearch/dksus.dll?pname&WT.z_cid=ref_octopart_dkc_buynow&site=us&lang=en&name=2466K-ND
+10       0805 0.1uF ceramic        capacitor                        Digi-Key    $0.03     $0.30         http://search.digikey.com/scripts/DkSearch/dksus.dll?Detail&name=478-1395-1-ND
+4        0805 1.0uF ceramic        capacitor                        Digi-Key    $0.06     $0.24         http://search.digikey.com/scripts/DkSearch/dksus.dll?Detail&name=311-1365-1-ND
+2        0805 2.2uF ceramic        capacitor                        Digi-Key    $0.08     $0.16         http://search.digikey.com/scripts/DkSearch/dksus.dll?Detail&name=PCC2324CT-ND
+2        0805 47uF tantalum        capacitor                        Digi-Key    $0.71     $1.42         http://search.digikey.com/scripts/DkSearch/dksus.dll?Detail&name=493-2908-1-ND
+2        0805 4.7K ohm             resistor                         Digi-Key    $0.01     $0.02         http://search.digikey.com/scripts/DkSearch/dksus.dll?Detail&name=311-4.7KARCT-ND
+1        0805 390K ohm             resistor                         Digi-Key    $0.01     $0.01         http://search.digikey.com/scripts/DkSearch/dksus.dll?Detail&name=311-390KCRCT-ND
