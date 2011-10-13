@@ -27,8 +27,16 @@ surface-mount parts, and is more challenging to assemble, but can still be assem
     The SQ-SEN-200 vibration sensor can be omitted. This part is only available directly from Signal Quest, with a minimum order quanity of 
     20. If omitted, the trip timer feature will not work.
 
-    The schematic and board layout show an external EEPROM chip. This was originally intended to store longer-term or higher-resolution 
-    altitude/temperature data, but was never implemented.
+    Older versions of the schematic and board layout show an external EEPROM chip. This was originally intended to store longer-term or 
+    higher-resolution altitude/temperature data, but was never implemented.
+
+    I recommend you don't solder the battery holder into place until everything else is built and tested. Use alligator clips or pieces of 
+    temporary wire to power the board before the battery holder is in place. Once the battery holder is in, it becomes very difficult to 
+    probe or fix solder joints for the adjacent components.
+
+    There may be a clearance problem between the battery holder and a few of the surface-mount components closest to it. If necessary, cut 
+    away a small portion of the battery holder plastic with a knife to make it fit. Do not cut away any more plastic than necessary, or the 
+    battery holder may bend when a battery is inserted.
 
     The bare BMP085 chip is difficult to hand-solder, because the pins are on its bottom, inaccessable with a soldering iron. To solder it, 
     first tin all 8 pads on the PCB with a small amount of solder. Make sure the heights of the solder blobs are as even as possible from pad 
@@ -36,10 +44,6 @@ surface-mount parts, and is more challenging to assemble, but can still be assem
     with a pick, heat the exposed portion of each PCB pad, one at a time, until the solder melts. The heat will be conducted along the pad, 
     under the chip, and the molten solder will bond to the hidden BMP085 pin. You may need to repeat this procedure several times to get a good 
     solder connection.  
-
-    There may be a clearance problem between the battery holder and a few of the surface-mount components closest to it. If necessary, cut 
-    away a small portion of the battery holder plastic with a knife to make it fit. Do not cut away any more plastic than necessary, or the 
-    battery holder may bend when a battery is inserted.
 
 4. Get an AVR programmer. I use the AVRISP mkII, which is $35 from Digi-Key. The $22 USBtinyISP AVR programmer is another popular choice: 
 see http://www.adafruit.com/products/46
@@ -120,5 +124,5 @@ library, named PIEZO.
 LICENSING
 
 The Backwoods Logger software is offered under the MIT license, whose terms appear in the source code files. The Backwoods Logger
-schematics, board layout files, Gerber files, and other content files are offered under the Creative Commons Attribution-ShareAlike 3.0
-license (CC BY-SA 3.0), whose terms can be viewed at http://creativecommons.org/licenses/by-sa/3.0/.  
+schematics, board layout files, Gerber files, and other content files are offered under the Creative Commons Attribution 3.0 license
+(CC BY 3.0), whose terms can be viewed at http://creativecommons.org/licenses/by/3.0/.  
