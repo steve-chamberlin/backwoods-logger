@@ -1,0 +1,43 @@
+#summary Instructions for using the Backwoods Logger
+#labels Featured
+
+= Overview =
+The Backwoods Logger is an ultra-light altimeter and thermometer, about the size of a Tic-Tac box and weighing about 1 ounce. It measures temperature, air pressure, and altitude (calculated from pressure) once a minute, and stores the data samples in memory for later review. The built-in screen can show current data, or graphs of data vs time for timescales from past 2 hours to past 2.5 days. Other built-in functions include calculation of daily highs and lows, rate of ascent, and estimated time of arrival at a user-defined altitude.
+
+There are two versions of the Backwoods Logger: the Logger Classic and Logger Mini. The two versions differ in size, weight, and screen resolution, but otherwise have nearly identical features and capabilities.
+
+The Logger is an open hardware project, based upon a Bosch BMP085 temperature / pressure sensor and an Atmel AVR ATmega328P microcontroller. This is the same microcontroller used in the popular Arduino electronics prototyping platform.
+
+= Features =
+* Temperature measurements in 0.5 degree steps, from -10F to 117.5F
+ * Air pressure measurements in 0.01 in-Hg steps, from 5.9 to 36.12 in-Hg
+ * Altitude (calculated from air pressure) measurements in 2 ft steps, from -1384 ft to 14999 ft
+ * Can configure units in degrees C, millibars, and meters through software modification
+ * Graphs of temperature, pressure, and altitude over time
+ * Three graph time scales: past 2 hours, past 10 hours, past 2.5 days
+ * Current rate of ascent/descent
+ * Estimated time of arrival at a user-defined altitude
+ * Weather forecast
+ * Station pressure and pressure at sea level
+ * Snapshot feature – make a permanent record of date, time, altitude, temperature, and pressure at important waypoints
+ * Current date and time display
+ * Battery voltage indicator
+ * Sound on/off control
+ * 3 to 6 month battery life, depending on usage
+
+= Power =
+The Backwoods Logger is an always-on device, recording a new data measurement every minute. There is no on-off switch. The device sleeps between each sample to conserve power, and battery life is 3 to 6 months.
+
+= Locking and Unlocking =
+To prevent unwanted actions resulting from accidental button pushes, the Logger is normally locked, and all menus and screens are disabled. To unlock the Logger, hold the *PREV* and *NEXT* buttons simultaneously. 
+
+After a period of inactivity, the Logger will automatically turn off the display and lock itself. The delay before auto-locking occurs can be configured in the *System* menu.
+
+= Navigating Screens and Menus =
+The Logger functions are organized into a list of 10 screens. You can move back and forward between screens in the list by pressing the *PREV* and *NEXT* buttons. The screen list is circular, so if you reach the end of the list, you will wrap around to the beginning.
+
+Many screens have menus. To access a screen's menu, press *SELECT* while viewing the screen. Navigate between menu options using the *PREV* and *NEXT* buttons, or select the *Exit Menu* option to return to the screen. 
+Add your content here.  Format your content with:
+  * Text in *bold* or _italic_
+  * Headings, paragraphs, and lists
+  * Automatic links to other wiki pages
