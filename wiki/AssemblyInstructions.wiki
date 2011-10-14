@@ -7,9 +7,9 @@ http://www.bigmessowires.com/logger_breakdown.jpg
 
 You can build the Backwoods Logger yourself, if you know a little about electronics. The total cost for parts is about $30 to $40 USD. The Logger Classic uses all through-hole parts, and can be assembled in an hour or two. The Logger Mini uses all surface-mount parts, and is a bit more challenging to build, but can still be assembled by hand. 
 
- # Make or buy the circuit board (PCB). Ask the [http://groups.google.com/group/backwoods-logger-discuss Backwoods Logger Discussion mailing list] if anyone has extra boards available. If not, send the included Gerber files to a PCB prototyping service, and they can manufacture a set of boards for about $25. 
- # Buy the required parts. The total cost should be around $30 to $40, depending on which version of the Logger you're building. See the official [PartList part list] for the required parts for each version of the Logger. 
- # Add the components to the board, one section at a time:
+ # *Make or buy the circuit board (PCB).* Ask the [http://groups.google.com/group/backwoods-logger-discuss Backwoods Logger Discussion mailing list] if anyone has extra boards available. If not, send the included Gerber files to a PCB prototyping service, and they can manufacture a set of boards for about $25. 
+ # *Buy the required parts.* The total cost should be around $30 to $40, depending on which version of the Logger you're building. See the official [PartList part list] for the required parts for each version of the Logger. 
+ # *Add the components to the board, one section at a time:*
     * Power components first. Verify that you get 3V before proceeding.
     * Microcontroller and ISP header. Verify that you can connect to the ATmega microcontroller using your programming software, and load the Backwoods Logger software onto the device. See the [ProgrammersGuide programming guide] for more details.
     * Display screen. Verify that you see text and graphics when power is applied.
