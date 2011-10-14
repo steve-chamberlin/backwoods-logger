@@ -3,7 +3,7 @@
 = Requirements =
  * *AVR programmer hardware.* The officially-supported hardware is the [http://store.atmel.com/PartDetail.aspx?q=p:10500054 AVRISP mkII], which is $34 from Atmel. The $22 [http://www.adafruit.com/products/46 USBtinyISP] AVR programmer is another popular choice.
  * *AVR downloader software.* [http://savannah.nongnu.org/projects/avrdude/ AVRDUDE] is a very popular multi-platform stand-alone downloader. Atmel's free [http://www.atmel.com/microsite/avr_studio_5/default.asp?source=redirect AVR Studio 5] is a full development environment that also includes a downloader.
- * * AVR development environment (optional).* If you want to customize the Backwoods Logger software or add new features, you'll need [http://www.atmel.com/microsite/avr_studio_5/default.asp?source=redirect AVR Studio 5]  or another AVR development environment.
+ * * AVR development environment (optional).* If you want to customize the Backwoods Logger software or add new features, you'll need [http://www.atmel.com/microsite/avr_studio_5/default.asp?source=redirect AVR Studio 5]  or another AVR development environment like [http://winavr.sourceforge.net/ WinAVR] or [http://www.avrfreaks.net/wiki/index.php/Documentation:AVR_GCC avr-gcc].
 
 = Programming the Default Software =
 If you just want to load the default Backwoods Logger software, all you need is the AVR downloader software and programming hardware. Make sure the Logger is powered on, and connect the programmer hardware to the six-pin ISP connector on the Logger. Launch AVRDUDE (or your other downloader). If necessary, select the device type as ATMEGA328P. Confirm that the board is working by connecting to the AVR and reading the device ID.
