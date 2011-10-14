@@ -95,3 +95,14 @@ The other temperature screens consist of three graphs showing temperature vs tim
 The main pressure screen shows the current station pressure (absolute pressure from the BMP085 sensor), rate of station pressure increase/decrease in the past hour, general rising/falling/steady trend in the past hour, sea level pressure (station pressure converted to a sea-level equivalent), and a simple weather forecast based on pressure changes over the past five hours. There is no menu for the pressure screen.
 
 The other pressure screens consist of three graphs showing pressure vs time at different time scales. Graphs are discussed separately below.
+
+=Graphs=
+For each of the three data types (altitude, temperature, and pressure), there are three graph screens that display data vs time for different time scales. For the Logger Classic, these time scales are past 90 minutes, past 8 hours, and past 2 days. For the Logger Mini, the time scales are past 2 hours, past 10 hours, and past 2.5 days. By default, the Y-axis minimum and maximum values are automatically set based on the graphed data.
+
+Press the *SELECT* button to enter the graph menu. The menu options are:
+
+ * Explore graph - overlays a crosshair onto the graph, which can be moved using *PREV* and *NEXT* to examine graph details and get the exact data value at any point on the graph. Exit explore mode by pressing *SELECT*.
+ * Drawing style - display the sample data as connected lines, or disconnected points
+ * Custom/Auto Y-axis min - set or reset a custom minimum value for the Y-axis
+ * Custom/Auto Y-axis max - set or reset a custom maximum value for the Y-axis
+
