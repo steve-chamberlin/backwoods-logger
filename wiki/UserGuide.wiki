@@ -9,7 +9,7 @@ There are two versions of the Backwoods Logger: the Logger Classic and Logger Mi
 The Logger is an open hardware project, based upon a Bosch BMP085 temperature / pressure sensor and an Atmel AVR ATmega328P microcontroller. This is the same microcontroller used in the popular Arduino electronics prototyping platform.
 
 = Features =
-* Temperature measurements in 0.5 degree steps, from -10F to 117.5F
+ * Temperature measurements in 0.5 degree steps, from -10F to 117.5F
  * Air pressure measurements in 0.01 in-Hg steps, from 5.9 to 36.12 in-Hg
  * Altitude (calculated from air pressure) measurements in 2 ft steps, from -1384 ft to 14999 ft
  * Can configure units in degrees C, millibars, and meters through software modification
@@ -41,3 +41,38 @@ Add your content here.  Format your content with:
   * Text in *bold* or _italic_
   * Headings, paragraphs, and lists
   * Automatic links to other wiki pages
+
+= Main Screen =
+The main screen can be configured to show up to six different user-defined measurements, one per line. To choose which measurements to show, enter the screen's menu by pressing *SELECT*, and then choose which of the six lines to configure. The choices are:
+
+ * Temperature
+ * Altitude
+ * Rate of ascent - average over the past 10 minutes
+ * Estimated time to destination altitude - set the destination altitude in the *Altitude* screen
+ * Station pressure - the absolute air pressure measured by the BMP085 sensor
+ * Sea level pressure - air pressure converted to a sea level equivalent
+ * Time of day
+ * Date and time
+ * Temperature trend - rising/falling/steady trend over the past hour
+ * Pressure trend - rising/falling/steady trend of station pressure over the past hour
+ * Weather forecast - a simple weather forecast based on pressure changes over the past five hours
+ * Empty - clears the line and displays nothing
+
+= System Screen =
+The System Screen displays a variety of Logger diagnostic data, and the screen's menu consists of general setup options and preferences. The displayed diagnostics are:
+
+ * Version - software version number
+ * Battery - current battery voltage- replace the battery is below 2.7V for the Classic, or below 1.1V for the Mini.
+ * Contrast
+ * Sound on/off
+
+Access the menu by pressing *SELECT*. The System menu options are:
+
+ * Date and time - set the current date/time
+ * Sleep delay - configure the inactivity delay before the Logger auto-locks 
+ * Sound - turn UI feedback and alarm sounds on and off
+ * LCD contrast - adjust the screen contrast
+ * LCD bias (Classic only) - sets the LCD's bias voltage, which acts sort of like a coarse adjustment for contrast
+ * LCD temp coef (Classic only) - sets the LCD's temperature-compensated contrast adjustment 
+ * Restore defaults - restore all settings to their default values, but do not erase any data
+ * Erase all data - erase all stored altitude, pressure, temperature, and snapshot data
