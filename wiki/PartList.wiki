@@ -2,24 +2,24 @@
 
 = Logger Classic =
 
-Quantity Part                      Purpose                  Supplier   Price     Ext Price     URL
-1        ATmega328P                microcontroller          Digi-Key    $3.93     $3.93        http://search.digikey.com/scripts/DkSearch/dksus.dll?Detail&name=ATMEGA328-PU-ND
-1        BMP085 breakout           pressure sensor          Sparkfun   $19.95    $19.95        http://www.sparkfun.com/products/9694
-1        Nokia 5110 breakout       84 x 48 display          Sparkfun    $9.95     $9.95        http://www.sparkfun.com/products/10168
-1        Murata PKM13EPYH4002      buzzer                   Digi-Key    $0.87     $0.87        http://search.digikey.com/scripts/DkSearch/dksus.dll?vendor=0&keywords=Murata+PKM13EPYH4002
-1        32768 Hz crystal 6 pF     crystal oscillator       Digi-Key    $0.32     $0.32        http://search.digikey.com/scripts/DkSearch/dksus.dll?Detail&name=SER3205-ND
-3        B3F-1020                  tactile switch           Digi-Key    $0.35     $1.05        http://search.digikey.com/scripts/DkSearch/dksus.dll?Detail&name=SW402-ND
-1        BC2032-E2                 CR2032 battery holder    Digi-Key    $0.62     $0.62        http://search.digikey.com/scripts/DkSearch/dksus.dll?Detail&name=BC2032-E2-ND
-3        0.1uF ceramic             through-hole capacitor      
-1        22uF electrolytic         through-hole capacitor      
-1        510 ohm through-hole      resistor      
-1        1K ohm through-hole       resistor      
-20       female 0.1 inch header    connector      
-20       male 0.1 inch header      connector      
+|| *Quantity* || *Part* || *Purpose* || *Supplier* || *Price* || *Ext Price* || *URL* ||
+|| 1 || ATmega328P || microcontroller || Digi-Key || $3.93 || $3.93 || http://search.digikey.com/scripts/DkSearch/dksus.dll?Detail&name=ATMEGA328-PU-ND ||
+|| 1   ||      BMP085 breakout  ||         pressure sensor     ||      Sparkfun  ||  $19.95   ||  $19.95    ||     http://www.sparkfun.com/products/9694 || 
+|| 1  ||       Nokia 5110 breakout  ||      84 x 48 display ||          Sparkfun ||    $9.95 ||     $9.95   ||      http://www.sparkfun.com/products/10168 || 
+|| 1   ||      Murata PKM13EPYH4002 ||      buzzer         ||           Digi-Key  ||   $0.87   ||   $0.87     ||    http://search.digikey.com/scripts/DkSearch/dksus.dll?vendor=0&keywords=Murata+PKM13EPYH4002 || 
+|| 1   ||      32768 Hz crystal 6 pF  ||    crystal oscillator   ||     Digi-Key   ||  $0.32   ||   $0.32  ||       http://search.digikey.com/scripts/DkSearch/dksus.dll?Detail&name=SER3205-ND || 
+|| 3  ||       B3F-1020     ||              tactile switch   ||         Digi-Key ||    $0.35 ||     $1.05    ||     http://search.digikey.com/scripts/DkSearch/dksus.dll?Detail&name=SW402-ND || 
+|| 1   ||      BC2032-E2      ||            CR2032 battery holder  ||   Digi-Key  ||   $0.62  ||    $0.62  ||       http://search.digikey.com/scripts/DkSearch/dksus.dll?Detail&name=BC2032-E2-ND || 
+|| 3  ||       0.1uF ceramic      ||        through-hole capacitor     ||  ||  ||  ||  ||  
+|| 1   ||      22uF electrolytic    ||      through-hole capacitor     ||  ||  ||  ||  ||  
+|| 1   ||      510 ohm through-hole   ||    resistor      ||  ||  ||  ||  || 
+|| 1  ||       1K ohm through-hole   ||     resistor      ||  ||  ||  ||  || 
+|| 20  ||      female 0.1 inch header ||    connector      ||  ||  ||  ||  || 
+|| 20  ||      male 0.1 inch header ||      connector      ||  ||  ||  ||  || 
 
 = Logger Mini =
 
-Quantity Part                      Purpose                          Supplier    Price     Ext Price     URL
+|| *Quantity* || *Part* || *Purpose* || *Supplier* || *Price* || *Ext Price* || *URL* ||
 1        ATmega328P-AU             microcontroller                  Digi-Key    $4.87     $4.87         http://search.digikey.com/scripts/dksearch/dksus.dll?pname&WT.z_cid=ref_octopart_dkc_buynow&site=us&lang=en&name=ATMEGA328P-AU-ND
 1        MAX1675EUA+               voltage regulator                Digi-Key    $5.73     $5.73         http://search.digikey.com/scripts/DkSearch/dksus.dll?Detail&name=MAX1675EUA%2B-ND
 1        BMP085                    pressure sensor                  Digi-Key    $7.89     $7.89         http://search.digikey.com/scripts/dksearch/dksus.dll?Detail&name=828-1005-1-ND
