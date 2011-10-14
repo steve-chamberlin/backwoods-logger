@@ -1,6 +1,8 @@
 #summary Instructions for building your own Backwoods Logger
 #labels Featured
 
+http://www.bigmessowires.com/logger_breakdown.jpg
+
 = Introduction =
 
 You can build the Backwoods Logger yourself, if you know a little about electronics. The total cost for parts is about $30 to $40 USD. The Logger Classic uses all through-hole parts, and can be assembled in an hour or two. The Logger Mini uses all surface-mount parts, and is a bit more challenging to build, but can still be assembled by hand. 
@@ -14,9 +16,13 @@ You can build the Backwoods Logger yourself, if you know a little about electron
     * BMP085 sensor, buzzer, and other remaining components.
 
 = Logger Classic =
+http://www.bigmessowires.com/logger_graph_150.jpg
+
 The BMP085 breakout board comes without the header pins attached, so you must solder your own header to it. Solder male header to the *same* side as the BMP085 chip. When you later mount the breakout board onto the socket on the main board, it should be upside down, with the BMP085 on the underside, hidden from view.
 
 = Logger Mini =
+http://www.bigmessowires.com/lm_triptime_150.jpg
+
 Don't solder the battery holder into place until everything else is built and tested. Use alligator clips or pieces of temporary wire to power the board before the battery holder is in place. Once the battery holder is in, it becomes very difficult to probe or fix solder joints for the adjacent components.
 
 There may be a clearance problem between the battery holder and a few of the surface-mount components closest to it. If necessary, cut away a small portion of the battery holder plastic with a knife to make it fit. Don't cut away any more plastic than necessary, or the battery holder may bend when a battery is inserted.
