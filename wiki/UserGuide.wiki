@@ -37,10 +37,6 @@ After a period of inactivity, the Logger will automatically turn off the display
 The Logger functions are organized into a list of 10 screens. You can move back and forward between screens in the list by pressing the *PREV* and *NEXT* buttons. The screen list is circular, so if you reach the end of the list, you will wrap around to the beginning.
 
 Many screens have menus. To access a screen's menu, press *SELECT* while viewing the screen. Navigate between menu options using the *PREV* and *NEXT* buttons, or select the *Exit Menu* option to return to the screen. 
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
 
 = Main Screen =
 The main screen can be configured to show up to six different user-defined measurements, one per line. To choose which measurements to show, enter the screen's menu by pressing *SELECT*, and then choose which of the six lines to configure. The choices are:
@@ -76,3 +72,26 @@ Access the menu by pressing *SELECT*. The System menu options are:
  * LCD temp coef (Classic only) - sets the LCD's temperature-compensated contrast adjustment 
  * Restore defaults - restore all settings to their default values, but do not erase any data
  * Erase all data - erase all stored altitude, pressure, temperature, and snapshot data
+
+=Snapshot Screen=
+In addition to the normal once a minute data samples, you can also make a data snapshot whenever you'd like. The snapshot records the current date, time, altitude, temperature, and pressure. Unlike normal data samples, snapshots are preserved forever (until erased or overwritten), and are a fun way to record important points like the top of a major summit.
+
+The Snapshot screen shows data from the most recent snapshot, if any. To take a new snapshot, enter the Snapshot menu by pressing *SELECT*, and choose the *Take Snapshot* menu option. To view and examine the list of stored snapshots, enter the Snapshot menu and select *View Snapshot Log*. You can scroll through the entries in the log using the *PREV* and *NEXT* buttons.
+
+=Altitude=
+The main altitude screen shows the current altitude and rate of ascent. If a goal altitude is defined, the screen also shows the goal altitude and the estimate time to destination. The Altitude menu, entered by pressing *SELECT*, provides access to two important settings:
+
+ * Calibrate - Sets the current true altitude. This establishes a known point on a mathematical curve of air pressure vs altitude that's used to make later altitude determinations. Calibrate the Logger every few days to compensate for air pressure changes due to local weather patterns. An uncalibrated Logger may report altitudes that are inaccurate by hundreds of feet.
+ * Set/Reset destination - sets or clears the goal altitude, used to estimate the "Time to Destination" shown on the main screen.
+
+The other altitude screens consist of three graphs showing altitude vs time at different time scales. Graphs are discussed separately below.
+
+=Temperature=
+The main temperature screen shows the current temperature, rate of temperature increase/decrease in the past hour, and general rising/falling/steady trend in the past hour. There is no menu for the temperature screen.
+
+The other temperature screens consist of three graphs showing temperature vs time at different time scales. Graphs are discussed separately below.
+
+=Pressure=
+The main pressure screen shows the current station pressure (absolute pressure from the BMP085 sensor), rate of station pressure increase/decrease in the past hour, general rising/falling/steady trend in the past hour, sea level pressure (station pressure converted to a sea-level equivalent), and a simple weather forecast based on pressure changes over the past five hours. There is no menu for the pressure screen.
+
+The other pressure screens consist of three graphs showing pressure vs time at different time scales. Graphs are discussed separately below.
