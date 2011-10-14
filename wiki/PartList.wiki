@@ -24,7 +24,7 @@
 || 1    ||     MAX1675EUA+        ||        voltage regulator     ||            Digi-Key  ||   $5.73  ||    $5.73   ||       http://search.digikey.com/scripts/DkSearch/dksus.dll?Detail&name=MAX1675EUA%2B-ND || 
 || 1   ||      BMP085         ||            pressure sensor      ||             Digi-Key  ||   $7.89  ||    $7.89    ||      http://search.digikey.com/scripts/dksearch/dksus.dll?Detail&name=828-1005-1-ND || 
 || 1  ||       UG-2864HSWEG01    ||         128x64 OLED display     ||          eBay   ||      $12.99@2 ||  $6.50@1  ||      http://www.ebay.com/itm/OLED-LCD-LED-Display-Module-white-0-96-128x64-dot-2pcs-/180729485266?pt=LH_DefaultDomain_0&hash=item2a145117d2 || 
-|| _or_ 1   ||      Graphic OLED display   ||    alternate display supplier: untested  || SparkFun  ||   $14.95   ||  $14.95 ||        http://www.sparkfun.com/products/10133 || 
+|| _or_ 1   ||      Graphic OLED display   ||    alternate display supplier: untested  || Sparkfun  ||   $14.95   ||  $14.95 ||        http://www.sparkfun.com/products/10133 || 
 || 1   ||      CCV-084B16   ||              buzzer               ||             Digi-Key  ||   $2.36  ||    $2.36       ||   http://search.digikey.com/scripts/dksearch/dksus.dll?Detail&name=102-1265-1-ND || 
 || 1    ||     32768 Hz crystal 6 pF  ||    crystal oscillator      ||          Digi-Key  ||   $0.32  ||    $0.32  ||        http://search.digikey.com/scripts/DkSearch/dksus.dll?Detail&name=SER3205-ND || 
 || 1     ||    UP1B-220-R     ||            inductor       ||                   Digi-Key  ||   $1.38  ||    $1.38   ||       http://search.digikey.com/scripts/dksearch/dksus.dll?Detail&name=513-1069-1-ND || 
