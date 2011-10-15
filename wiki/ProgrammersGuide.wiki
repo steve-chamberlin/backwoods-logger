@@ -23,13 +23,13 @@ You are encouraged to experiment with changes to the Backwoods Logger software a
 The Backwoods Logger source code is written in C, and is built with AVR Studio 5. The included hikea.avrgccproj file will only work with AVR Studio 5. If you're using a different version of AVR Studio, or a different compiler entirely, you'll need to create your own project file or makefile with the following settings:
 
 ===Logger Classic===
-  * define these preprocessor symbols: LOGGER_CLASSIC, NOKIA_LCD, F_CPU=1000000
-  * include these libraries: libm.a
+  * define these preprocessor symbols: _LOGGER_CLASSIC, NOKIA_LCD, F_CPU=1000000_
+  * include these libraries: _libm.a_
   * change these fuses: *EESAVE* on. Fuse settings are _low: 0x62, high: 0xD1, extended: 0xFF_
 
 ===Logger Mini===
-  * define these preprocessor symbols: LOGGER_MINI, SSD1306_LCD, F_CPU=8000000
-  * include these libraries: libm.a
+  * define these preprocessor symbols: _LOGGER_MINI, SSD1306_LCD, F_CPU=8000000_
+  * include these libraries: _libm.a_
   * change these fuses: *EESAVE* on, *CKDIV8* off. Fuse settings are _low: 0xE2, high: 0xD1, extended: 0xFF_
 
 Add your awesome new feature to the C files, compile the project to generate a new .hex file, and program the .hex file to the Logger using the same method as for the default software. 
