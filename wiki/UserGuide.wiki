@@ -2,7 +2,7 @@
 #labels Featured
 
 = Overview =
-The Backwoods Logger is an ultra-light altimeter and thermometer, about the size of a Tic-Tac box and weighing about 1 ounce. It measures temperature, air pressure, and altitude (calculated from pressure) once a minute, and stores the data samples in memory for later review. The built-in screen can show current data, or graphs of data vs time for timescales from past 2 hours to past 2.5 days. Other built-in functions include calculation of daily highs and lows, rate of ascent, and estimated time of arrival at a user-defined altitude.
+The Backwoods Logger is a programmable graphing altimeter and thermometer, about the size of a Tic-Tac box and weighing about 1 ounce. It measures temperature, air pressure, and altitude (calculated from pressure) once a minute, and stores the data samples in memory for later review. The built-in screen can show current data, or graphs of data vs time for timescales from past 2 hours to past 2.5 days. Other built-in functions include calculation of daily highs and lows, rate of ascent, and estimated time of arrival at a user-defined altitude.
 
 There are two versions of the Backwoods Logger: the Logger Classic and Logger Mini. The two versions differ in size, weight, and screen resolution, but otherwise have nearly identical features and capabilities.
 
@@ -105,4 +105,3 @@ Press the *SELECT* button to enter the graph menu. The menu options are:
  * Drawing style - display the sample data as connected lines, or disconnected points
  * Custom/Auto Y-axis min - set or reset a custom minimum value for the Y-axis
  * Custom/Auto Y-axis max - set or reset a custom maximum value for the Y-axis
-
