@@ -10,7 +10,14 @@ If you just want to load the default Backwoods Logger software, all you need is 
 
 There are two different versions of the Backwoods Logger software, one for the Classic and one for the Mini. Find the file *hikea.hex* in the subdirectory for your version of the Logger, and use the downloader to flash the file to the AVR.
 
+===Fuses===
 Set the *EESAVE* fuse on to prevent your stored altitude/temperature data from being erased every time you reprogram the AVR.
+
+For the Mini, set the *CKDIV8* fuse off to get the correct buzzer tones and fast screen drawing.
+
+The Classic fuse settings should be: *low: 0x62, high: 0xD1, extended: 0xFF*
+
+The Mini fuse settings should be: *low: 0xE2, high: 0xD1, extended: 0xFF*
 
 = Customizing the Software =
 You are encouraged to experiment with changes to the Backwoods Logger software and hardware. Development is an open source, open hardware project that welcomes everyone's involvement.
