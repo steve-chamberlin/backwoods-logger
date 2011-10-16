@@ -74,9 +74,11 @@ Access the menu by pressing *SELECT*. The System menu options are:
  * Erase all data - erase all stored altitude, pressure, temperature, and snapshot data
 
 =Snapshot Screen=
-In addition to the normal once a minute data samples, you can also make a data snapshot whenever you'd like. The snapshot records the current date, time, altitude, temperature, and pressure. Unlike normal data samples, snapshots are preserved forever (until erased or overwritten), and are a fun way to record important points like the top of a major summit.
+In addition to the normal once a minute data samples, you can also make a data snapshot whenever you'd like. The snapshot records the current date, time, altitude, temperature, and pressure. Unlike normal data samples, snapshots are preserved forever (until erased or overwritten), and are a fun way to record important points like the top of a major summit. 
 
 The Snapshot screen shows data from the most recent snapshot, if any. To take a new snapshot, enter the Snapshot menu by pressing *SELECT*, and choose the *Take Snapshot* menu option. To view and examine the list of stored snapshots, enter the Snapshot menu and select *View Snapshot Log*. You can scroll through the entries in the log using the *PREV* and *NEXT* buttons.
+
+The Logger Mini has storage for 62 snapshots, and the Logger Classic stores 84 snapshots. When the snapshot list is full, taking a new snapshot will replace the oldest snapshot in the list.
 
 =Altitude=
 The main altitude screen shows the current altitude and rate of ascent. If a goal altitude is defined, the screen also shows the goal altitude and the estimate time to destination. The Altitude menu, entered by pressing *SELECT*, provides access to two important settings:
