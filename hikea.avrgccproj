@@ -95,7 +95,6 @@
     <ListValues>
       <Value>LOGGER_MINI</Value>
       <Value>SSD1306_LCD</Value>
-      <Value>SHAKE_SENSOR</Value>
       <Value>F_CPU=8000000</Value>
     </ListValues>
   </avrgcc.compiler.symbols.DefSymbols>
