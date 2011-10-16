@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# AvrStudio Solution File, Format Version 11.00
+Project("{D1100916-62DA-4D80-A9B4-55A1E7CCEEB3}") = "hikea", "hikea.avrgccproj", "{D429DA63-CC7F-4944-A391-3CA413012FE7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Classic - Release|AVR = Classic - Release|AVR
+		Debug|AVR = Debug|AVR
+		Mini - Release|AVR = Mini - Release|AVR
+		Release|AVR = Release|AVR
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D429DA63-CC7F-4944-A391-3CA413012FE7}.Classic - Release|AVR.ActiveCfg = Classic - Release|AVR
+		{D429DA63-CC7F-4944-A391-3CA413012FE7}.Classic - Release|AVR.Build.0 = Classic - Release|AVR
+		{D429DA63-CC7F-4944-A391-3CA413012FE7}.Debug|AVR.ActiveCfg = Debug|AVR
+		{D429DA63-CC7F-4944-A391-3CA413012FE7}.Debug|AVR.Build.0 = Debug|AVR
+		{D429DA63-CC7F-4944-A391-3CA413012FE7}.Mini - Release|AVR.ActiveCfg = Mini - Release|AVR
+		{D429DA63-CC7F-4944-A391-3CA413012FE7}.Mini - Release|AVR.Build.0 = Mini - Release|AVR
+		{D429DA63-CC7F-4944-A391-3CA413012FE7}.Release|AVR.ActiveCfg = Release|AVR
+		{D429DA63-CC7F-4944-A391-3CA413012FE7}.Release|AVR.Build.0 = Release|AVR
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
