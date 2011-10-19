@@ -6,6 +6,7 @@
 || 1 || ATmega328P || microcontroller || Digi-Key || $3.93 || $3.93 || http://search.digikey.com/scripts/DkSearch/dksus.dll?Detail&name=ATMEGA328-PU-ND ||
 || 1   ||      BMP085 breakout  ||         pressure sensor     ||      Sparkfun  ||  $19.95   ||  $19.95    ||     http://www.sparkfun.com/products/9694 || 
 || 1  ||       Nokia 5110 breakout  ||      84 x 48 display ||          Sparkfun ||    $9.95 ||     $9.95   ||      http://www.sparkfun.com/products/10168 || 
+|| _or_ 1  ||       Nokia 5110 breakout  ||      alternate supplier ||          Adafruit  ||    $10.00 ||     $10.00   ||      http://www.adafruit.com/products/338 || 
 || 1   ||      Murata PKM13EPYH4002 ||      buzzer         ||           Digi-Key  ||   $0.87   ||   $0.87     ||    http://search.digikey.com/scripts/DkSearch/dksus.dll?vendor=0&keywords=Murata+PKM13EPYH4002 || 
 || 1   ||      32768 Hz crystal 6 pF  ||    crystal oscillator   ||     Digi-Key   ||  $0.32   ||   $0.32  ||       http://search.digikey.com/scripts/DkSearch/dksus.dll?Detail&name=SER3205-ND || 
 || 3  ||       B3F-1020     ||              tactile switch   ||         Digi-Key ||    $0.35 ||     $1.05    ||     http://search.digikey.com/scripts/DkSearch/dksus.dll?Detail&name=SW402-ND || 
@@ -24,6 +25,7 @@
 || 1    ||     MAX1675EUA+        ||        voltage regulator     ||            Digi-Key  ||   $5.73  ||    $5.73   ||       http://search.digikey.com/scripts/DkSearch/dksus.dll?Detail&name=MAX1675EUA%2B-ND || 
 || 1   ||      BMP085         ||            pressure sensor      ||             Digi-Key  ||   $7.89  ||    $7.89    ||      http://search.digikey.com/scripts/dksearch/dksus.dll?Detail&name=828-1005-1-ND || 
 || 1  ||       UG-2864HSWEG01    ||         128x64 OLED display     ||          eBay   ||      $12.99@2 ||  $6.50@1  ||      http://www.ebay.com/itm/OLED-LCD-LED-Display-Module-white-0-96-128x64-dot-2pcs-/180729485266?pt=LH_DefaultDomain_0&hash=item2a145117d2 || 
+|| _or_ 1   ||      Graphic OLED display   ||    alternate display supplier  || Jack Wan  ||   $63.20@10   ||  $6.32@1 ||       http://www.aliexpress.com/fm-store/805369/210820293-419301675/0-96-inch-128x64-Internal-DC-DC-OLED-screen-OLED-display-OLED-panel-OLED.html  || 
 || _or_ 1   ||      Graphic OLED display   ||    alternate display supplier: untested  || Sparkfun  ||   $14.95   ||  $14.95 ||        http://www.sparkfun.com/products/10133 || 
 || 1   ||      CCV-084B16   ||              buzzer               ||             Digi-Key  ||   $2.36  ||    $2.36       ||   http://search.digikey.com/scripts/dksearch/dksus.dll?Detail&name=102-1265-1-ND || 
 || 1    ||     32768 Hz crystal 6 pF  ||    crystal oscillator      ||          Digi-Key  ||   $0.32  ||    $0.32  ||        http://search.digikey.com/scripts/DkSearch/dksus.dll?Detail&name=SER3205-ND || 
