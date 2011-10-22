@@ -33,7 +33,7 @@ It's normally best to get all parts from the same place, to save shipping costs.
 || 1  ||       SSD1306 Graphic OLED display    ||         128x64 OLED display     ||          eBay   ||      $12.99@2 ||  $6.50@1  ||      http://www.ebay.com/itm/OLED-LCD-LED-Display-Module-white-0-96-128x64-dot-2pcs-/180729485266?pt=LH_DefaultDomain_0&hash=item2a145117d2 || 
 || 1   ||      CCV-084B16   ||              buzzer               ||             Digi-Key  ||   $2.36  ||    $2.36       ||   http://search.digikey.com/scripts/dksearch/dksus.dll?Detail&name=102-1265-1-ND || 
 || 1    ||     32768 Hz crystal 6 pF  ||    crystal oscillator      ||          Digi-Key  ||   $0.32  ||    $0.32  ||        http://search.digikey.com/scripts/DkSearch/dksus.dll?Detail&name=SER3205-ND || 
-|| 1     ||    UP1B-220-R     ||            inductor       ||                   Digi-Key  ||   $1.38  ||    $1.38   ||       http://search.digikey.com/scripts/dksearch/dksus.dll?Detail&name=513-1069-1-ND || 
+|| 1     ||    UP1B-220-R     ||            inductor       ||                   Digi-Key  ||   $1.30  ||    $1.30   ||       http://search.digikey.com/scripts/dksearch/dksus.dll?Detail&name=513-1069-1-ND || 
 || 1   ||      MBR0520L Schottky       ||           diode       ||             Digi-Key  ||   $0.63 ||     $0.63   ||       http://search.digikey.com/scripts/dksearch/dksus.dll?pname&WT.z_cid=ref_octopart_dkc_buynow&site=us&lang=en&name=MBR0520LCT-ND || 
 || 3   ||      B3FS-1010      ||            tactile switch      ||              Digi-Key  ||   $0.65  ||    $1.95    ||      http://search.digikey.com/scripts/dksearch/dksus.dll?pname&WT.z_cid=ref_octopart_dkc_buynow&site=us&lang=en&name=SW1141-ND || 
 || 1   ||      2466K-ND     ||              AAA battery holder       ||         Digi-Key   ||  $1.45  ||    $1.45  ||       http://search.digikey.com/scripts/dksearch/dksus.dll?pname&WT.z_cid=ref_octopart_dkc_buynow&site=us&lang=en&name=2466K-ND || 
@@ -49,4 +49,5 @@ It's normally best to get all parts from the same place, to save shipping costs.
 
 || *Quantity* || *Part* || *Purpose* || *Supplier* || *Price* || *Ext Price* || *URL* ||
 || 1  ||       ATmega328P-AU   ||           microcontroller        ||           Mouser  ||   $3.42  ||    $3.42  ||        http://www.mouser.com/ProductDetail/Atmel/ATMEGA328P-AU/?qs=sGAEpiMZZMvu0Nwh4cA1wRKJzS2Lmyk%252brzyUxJFNGOs%3d || 
+|| 1    ||     MAX1675EUA+        ||        voltage regulator     ||            Mouser  ||   $5.46  ||    $5.46   ||       http://www.mouser.com/ProductDetail/Maxim-Integrated-Products/MAX1675EUA+/?qs=sGAEpiMZZMv5LMjColG4yFF%252bmi9LAs3BO20AF3zPNiw%3d || 
 || 1   ||      SSD1306 Graphic OLED display   ||    128x64 OLED display ||  Jack Wan  ||   $63.20@10   ||  $6.32@1 ||       http://www.aliexpress.com/fm-store/805369/210820293-419301675/0-96-inch-128x64-Internal-DC-DC-OLED-screen-OLED-display-OLED-panel-OLED.html  || 
