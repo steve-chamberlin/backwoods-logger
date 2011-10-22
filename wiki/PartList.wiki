@@ -5,8 +5,8 @@
 
 || *Quantity* || *Part* || *Purpose* || *Supplier* || *Price* || *Ext Price* || *URL* ||
 || 1 || ATmega328P || microcontroller || Digi-Key || $3.93 || $3.93 || http://search.digikey.com/scripts/DkSearch/dksus.dll?Detail&name=ATMEGA328-PU-ND ||
-|| 1   ||      BMP085 breakout  ||         pressure sensor     ||      Sparkfun  ||  $19.95   ||  $19.95    ||     http://www.sparkfun.com/products/9694 || 
-|| 1  ||       Nokia 5110 breakout  ||      84 x 48 display ||          Sparkfun ||    $9.95 ||     $9.95   ||      http://www.sparkfun.com/products/10168 || 
+|| 1   ||      BMP085  ||         pressure sensor breakout board    ||      Sparkfun  ||  $19.95   ||  $19.95    ||     http://www.sparkfun.com/products/9694 || 
+|| 1  ||       Nokia 5110  ||      84 x 48 display  breakout board ||          Sparkfun ||    $9.95 ||     $9.95   ||      http://www.sparkfun.com/products/10168 || 
 || 1   ||      Murata PKM13EPYH4002 ||      buzzer         ||           Digi-Key  ||   $0.87   ||   $0.87     ||    http://search.digikey.com/scripts/DkSearch/dksus.dll?vendor=0&keywords=Murata+PKM13EPYH4002 || 
 || 1   ||      32768 Hz crystal 6 pF  ||    crystal oscillator   ||     Digi-Key   ||  $0.32   ||   $0.32  ||       http://search.digikey.com/scripts/DkSearch/dksus.dll?Detail&name=SER3205-ND || 
 || 3  ||       B3F-1020     ||              tactile switch   ||         Digi-Key ||    $0.35 ||     $1.05    ||     http://search.digikey.com/scripts/DkSearch/dksus.dll?Detail&name=SW402-ND || 
