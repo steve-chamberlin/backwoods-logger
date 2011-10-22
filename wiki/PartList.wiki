@@ -24,7 +24,7 @@ It's normally best to get all parts from the same place, to save shipping costs.
 || *Quantity* || *Part* || *Purpose* || *Supplier* || *Price* || *Ext Price* || *URL* ||
 || 1  ||       Nokia 5110 breakout  ||      84 x 48 display ||          Adafruit  ||    $10.00 ||     $10.00   ||      http://www.adafruit.com/products/338 || 
 
----
+----
 
 = Logger Mini =
 
