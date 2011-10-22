@@ -1,4 +1,5 @@
 #summary Official part list for each version of the Logger
+#labels Featured
 
 = Logger Classic =
 
