@@ -19,6 +19,13 @@
 || 20  ||      female 0.1 inch header ||    connector      ||  ||  ||  ||  || 
 || 20  ||      male 0.1 inch header ||      connector      ||  ||  ||  ||  || 
 
+===Alternate Suppliers===
+It's normally best to get all parts from the same place, to save shipping costs. If you can combine shipping with another order, though, you may save money with these alternate suppliers.
+
+|| *Quantity* || *Part* || *Purpose* || *Supplier* || *Price* || *Ext Price* || *URL* ||
+|| 1 || ATmega328P || microcontroller || Digi-Key || $3.93 || $3.93 || http://search.digikey.com/scripts/DkSearch/dksus.dll?Detail&name=ATMEGA328-PU-ND ||
+|| 1  ||       Nokia 5110 breakout  ||      84 x 48 display ||          Adafruit  ||    $10.00 ||     $10.00   ||      http://www.adafruit.com/products/338 || 
+
 = Logger Mini =
 
 || *Quantity* || *Part* || *Purpose* || *Supplier* || *Price* || *Ext Price* || *URL* ||
@@ -26,12 +33,10 @@
 || 1    ||     MAX1675EUA+        ||        voltage regulator     ||            Digi-Key  ||   $5.73  ||    $5.73   ||       http://search.digikey.com/scripts/DkSearch/dksus.dll?Detail&name=MAX1675EUA%2B-ND || 
 || 1   ||      BMP085         ||            pressure sensor      ||             Digi-Key  ||   $7.89  ||    $7.89    ||      http://search.digikey.com/scripts/dksearch/dksus.dll?Detail&name=828-1005-1-ND || 
 || 1  ||       SSD1306 Graphic OLED display    ||         128x64 OLED display     ||          eBay   ||      $12.99@2 ||  $6.50@1  ||      http://www.ebay.com/itm/OLED-LCD-LED-Display-Module-white-0-96-128x64-dot-2pcs-/180729485266?pt=LH_DefaultDomain_0&hash=item2a145117d2 || 
-|| _or 1_   ||      _SSD1306 Graphic OLED display_   ||    _alternate supplier_ || _Jack Wan_  ||   _$63.20@10_   ||  _$6.32@1_ ||       http://www.aliexpress.com/fm-store/805369/210820293-419301675/0-96-inch-128x64-Internal-DC-DC-OLED-screen-OLED-display-OLED-panel-OLED.html  || 
 || 1   ||      CCV-084B16   ||              buzzer               ||             Digi-Key  ||   $2.36  ||    $2.36       ||   http://search.digikey.com/scripts/dksearch/dksus.dll?Detail&name=102-1265-1-ND || 
 || 1    ||     32768 Hz crystal 6 pF  ||    crystal oscillator      ||          Digi-Key  ||   $0.32  ||    $0.32  ||        http://search.digikey.com/scripts/DkSearch/dksus.dll?Detail&name=SER3205-ND || 
 || 1     ||    UP1B-220-R     ||            inductor       ||                   Digi-Key  ||   $1.38  ||    $1.38   ||       http://search.digikey.com/scripts/dksearch/dksus.dll?Detail&name=513-1069-1-ND || 
 || 1   ||      MBR0520L Schottky       ||           diode       ||             Digi-Key  ||   $0.63 ||     $0.63   ||       http://search.digikey.com/scripts/dksearch/dksus.dll?pname&WT.z_cid=ref_octopart_dkc_buynow&site=us&lang=en&name=MBR0520LCT-ND || 
-|| _or 1_   ||      _1N5819 Schottky_       ||           _alternate supplier_       ||            _Sparkfun_  ||   _$0.15_ ||     _$0.15_   ||       http://www.sparkfun.com/products/10926 || 
 || 3   ||      B3FS-1010      ||            tactile switch      ||              Digi-Key  ||   $0.65  ||    $1.95    ||      http://search.digikey.com/scripts/dksearch/dksus.dll?pname&WT.z_cid=ref_octopart_dkc_buynow&site=us&lang=en&name=SW1141-ND || 
 || 1   ||      2466K-ND     ||              AAA battery holder       ||         Digi-Key   ||  $1.45  ||    $1.45  ||       http://search.digikey.com/scripts/dksearch/dksus.dll?pname&WT.z_cid=ref_octopart_dkc_buynow&site=us&lang=en&name=2466K-ND || 
 || 10   ||     0805 0.1uF ceramic   ||      capacitor           ||              Digi-Key  ||   $0.03  ||    $0.30         || http://search.digikey.com/scripts/DkSearch/dksus.dll?Detail&name=478-1395-1-ND || 
@@ -40,3 +45,9 @@
 || 2     ||    0805 47uF tantalum   ||      capacitor              ||           Digi-Key  ||   $0.71   ||   $1.42     ||    http://search.digikey.com/scripts/DkSearch/dksus.dll?Detail&name=493-2908-1-ND || 
 || 2    ||     0805 4.7K ohm      ||        resistor         ||                 Digi-Key  ||   $0.01  ||    $0.02    ||      http://search.digikey.com/scripts/DkSearch/dksus.dll?Detail&name=311-4.7KARCT-ND || 
 || 1   ||      0805 390K ohm  ||            resistor          ||                Digi-Key  ||   $0.01  ||    $0.01   ||       http://search.digikey.com/scripts/DkSearch/dksus.dll?Detail&name=311-390KCRCT-ND || 
+
+===Alternate Suppliers===
+It's normally best to get all parts from the same place, to save shipping costs. If you can combine shipping with another order, though, you may save money with these alternate suppliers.
+
+|| *Quantity* || *Part* || *Purpose* || *Supplier* || *Price* || *Ext Price* || *URL* ||
+|| 1   ||      SSD1306 Graphic OLED display   ||    128x64 OLED display ||  Jack Wan  ||   $63.20@10   ||  $6.32@1 ||       http://www.aliexpress.com/fm-store/805369/210820293-419301675/0-96-inch-128x64-Internal-DC-DC-OLED-screen-OLED-display-OLED-panel-OLED.html  || 
