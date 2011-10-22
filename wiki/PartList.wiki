@@ -31,7 +31,7 @@
 || 1    ||     32768 Hz crystal 6 pF  ||    crystal oscillator      ||          Digi-Key  ||   $0.32  ||    $0.32  ||        http://search.digikey.com/scripts/DkSearch/dksus.dll?Detail&name=SER3205-ND || 
 || 1     ||    UP1B-220-R     ||            inductor       ||                   Digi-Key  ||   $1.38  ||    $1.38   ||       http://search.digikey.com/scripts/dksearch/dksus.dll?Detail&name=513-1069-1-ND || 
 || 1   ||      MBR0520L Schottky       ||           diode       ||             Digi-Key  ||   $0.63 ||     $0.63   ||       http://search.digikey.com/scripts/dksearch/dksus.dll?pname&WT.z_cid=ref_octopart_dkc_buynow&site=us&lang=en&name=MBR0520LCT-ND || 
-|| _or 1_   ||      1N5819 Schottky       ||           _alternate supplier_       ||            _Sparkfun_  ||   _$0.15_ ||     _$0.15_   ||       http://www.sparkfun.com/products/10926 || 
+|| _or 1_   ||      _1N5819 Schottky_       ||           _alternate supplier_       ||            _Sparkfun_  ||   _$0.15_ ||     _$0.15_   ||       http://www.sparkfun.com/products/10926 || 
 || 3   ||      B3FS-1010      ||            tactile switch      ||              Digi-Key  ||   $0.65  ||    $1.95    ||      http://search.digikey.com/scripts/dksearch/dksus.dll?pname&WT.z_cid=ref_octopart_dkc_buynow&site=us&lang=en&name=SW1141-ND || 
 || 1   ||      2466K-ND     ||              AAA battery holder       ||         Digi-Key   ||  $1.45  ||    $1.45  ||       http://search.digikey.com/scripts/dksearch/dksus.dll?pname&WT.z_cid=ref_octopart_dkc_buynow&site=us&lang=en&name=2466K-ND || 
 || 10   ||     0805 0.1uF ceramic   ||      capacitor           ||              Digi-Key  ||   $0.03  ||    $0.30         || http://search.digikey.com/scripts/DkSearch/dksus.dll?Detail&name=478-1395-1-ND || 
