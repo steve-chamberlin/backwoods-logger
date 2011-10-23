@@ -23,7 +23,7 @@ You can build a blsync adapter from 0.1" header and a MOSFET, or even just wires
 
 [http://www.bigmessowires.com/blsync-schematic.png]
 
-A 2N7000 or similar N-channel enhancement mode MOSFET is used to perform level conversion on the TX line. If you will always be using a 3.3V USB-serial cable, you can omit the MOSFET and connect TX directly to MISO.
+A BS170, 2N7000, or similar N-channel enhancement mode MOSFET is used to perform level conversion on the TX line. If you will always be using a 3.3V USB-serial cable, you can omit the MOSFET and connect TX directly to MISO.
 
 A pre-assembled blsync adapter using a custom-made PCB may also be available in the future, for a more finished solution.
 
