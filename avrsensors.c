@@ -51,6 +51,7 @@ long readVcc()
 	return result; 
 } 
 
+/*
 long readTemp() 
 {     
 	PRR &= ~(1<<PRADC); // power ADC
@@ -71,3 +72,4 @@ long readTemp()
 		
 	return result; 
 } 
+*/
