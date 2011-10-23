@@ -1,0 +1,20 @@
+#summary Backwoods Logger sync utility and adapter.
+#labels Featured
+
+= Introduction =
+
+The blsync utility is a command-line program used to transfer data from a Logger to a PC. The blsync adapter is a hardware module that plugs into the Logger's ISP port, and converts it to a 6-pin serial connector.
+
+= USB-Serial =
+
+Blsync communicates with the Logger using a 5V or 3.3V serial connection. You will need a USB-serial adapater such as:
+
+ * [http://www.adafruit.com/products/284 Adafruit FTDI Friend]
+ * [http://www.sparkfun.com/products/9873 Sparkfun FTDI Basic Breakout 3.3V]
+ * [http://www.sparkfun.com/products/9717 Sparkfun FTDI Cable 3.3V]
+
+The Backwoods Logger runs at 3.3V, but because the blsync adapter contains a built-in level-converter, you can use either a 5V or 3.3V USB-Serial cable. 
+
+= Blsync Adapter =
+
+The blsync adapter plugs into the Logger's ISP port, and converts it to a 6-pin serial connector.
