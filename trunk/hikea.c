@@ -41,6 +41,10 @@
 #include "sampling.h"
 #include "clock.h"
 #include "speaker.h"
+#include "serial.h"
+
+// Atmel's calib_32kHz.c file has no header
+void PerformCalibration(void);
 
 #define BUTTON_NEXT PB0
 #define BUTTON_SELECT PB1
@@ -168,6 +172,9 @@ const char system8[] PROGMEM = "Erase All Data";
 const char* systemMenu[] PROGMEM = { 
 	exitMenu, system1, system2, system3, system4, system5, system6, system7, system8, NULL 
 };
+
+// pre-baked version number string
+char versionStr[11];
 
 // data type menu
 
@@ -387,11 +394,14 @@ void HandleSetTimeSelect()
 void HandleSetTimePrevNext(uint8_t step)
 {
 	uint8_t februaryLength = (setting_year % 4 == 0) ? 29 : 28;
-	uint8_t monthLength = februaryLength;
-	if (setting_month == 1 || setting_month == 3 || setting_month == 5 || setting_month == 7 || setting_month == 8 || setting_month == 10 || setting_month == 12)
-		monthLength = 31;
+	uint8_t monthLength;
+	if (setting_month == 2)
+		monthLength = februaryLength;
 	else if (setting_month == 4 || setting_month == 6 || setting_month == 9 || setting_month == 11)
 		monthLength = 30;
+	else
+		monthLength = 31;
+	
 	uint8_t pm = setting_hour >= 12;
 			
 	switch (selectedMenuItemIndex)
@@ -958,11 +968,17 @@ int main(void)
 	SamplingInit(0);
 	
 	SpeakerInit();
+	SerialInit();
 	InitSettings();
 	
 #ifdef SHAKE_SENSOR
 	ShakeInit();
 #endif
+	
+	// calibrate the internal RC oscillator
+	PerformCalibration();
+	// do it twice, because on reset immediately after programming, it always seems to get a bogus result
+	PerformCalibration(); 
 	
 	sei();	
 	
@@ -998,13 +1014,42 @@ int main(void)
     TIFR2 = (1 << TOV2); // clear the timer 2 interrupt flags 
     TIMSK2 = (1 << TOIE2); // enable timer 2 overflow interrupt
 
-	// enable the pin change interrupts for buttons
-	PCMSK0 |= (1<<PCINT0) | (1<<PCINT1) | (1<<PCINT2); 
+	// set the pin change interrupt masks for buttons
+	PCMSK0 |= (1<<PCINT0) | (1<<PCINT1) | (1<<PCINT2);
+	// set the state change interrupt mask for the serial input
+	PCMSK0 |= (1<<PCINT4) ;
+	// enable the interrupts
 	PCICR |= (1<<PCIE0); 
 				
 	// disable unused peripherals
 	PRR |= (1<<PRTWI) | (1<<PRSPI) | (1<<PRTIM1) | (1<<PRTIM0) | (1<<PRUSART0) | (1<<PRADC);
 
+	// construct the version string
+	uint8_t ind = 0;
+	versionStr[ind++] = pgm_read_byte(&dateStr[9]);
+	versionStr[ind++] = pgm_read_byte(&dateStr[10]);
+	uint8_t month = StrToMonth(dateStr);
+	versionStr[ind++] = '0' + (month/10);
+	versionStr[ind++] = '0' + (month%10);
+	uint8_t dayTens = pgm_read_byte(&dateStr[4]);
+	if (dayTens == ' ')
+	{
+		versionStr[ind++] = '0';
+	}
+	else
+	{
+		versionStr[ind++] = dayTens;
+	}		
+	versionStr[ind++] = pgm_read_byte(&dateStr[5]);
+	for (uint8_t i=0; i<5; i++)
+	{
+		if (i != 2)
+		{
+			versionStr[ind++] = pgm_read_byte(&timeStr[i]);		
+		}			
+	}	
+	versionStr[ind++] = 0;
+		
 	newSampleNeeded = 1;
 			
 	while (1) 
@@ -1809,31 +1854,7 @@ void DrawModeScreen()
 		{
 			LcdGoto(0,1);
 			LcdTinyString("Version ", TEXT_NORMAL);
-					
-			strcpy_P(str, &dateStr[9]);
-			LcdTinyString(str, TEXT_NORMAL);
-			uint8_t month = StrToMonth(dateStr);
-			if (month < 10)
-			{
-				LcdTinyString("0", TEXT_NORMAL);
-			}
-			itoa(month, str, 10);
-			LcdTinyString(str, TEXT_NORMAL);
-			uint8_t dayTens = dateStr[4];
-			if (dayTens == ' ')
-			{
-				LcdTinyString("0", TEXT_NORMAL);
-				strncpy_P(str, &dateStr[5], 1);
-			}
-			else
-			{
-				strncpy_P(str, &dateStr[4], 2);
-			}
-			LcdTinyString(str, TEXT_NORMAL);
-			strncpy_P(str, &timeStr[0], 2);
-			LcdTinyString(str, TEXT_NORMAL);
-			strncpy_P(str, &timeStr[3], 2);
-			LcdTinyString(str, TEXT_NORMAL);
+			LcdTinyString(versionStr, TEXT_NORMAL);
 					
 			long avrVcc = readVcc();
 			avrVcc = (avrVcc + 5) / 10; // round to hundredths of a volt
@@ -2493,10 +2514,30 @@ ISR(TIMER2_OVF_vect)
     while (ASSR & (1<<TCR2AUB)) {} // wait until the asynchronous busy flag is zero	
 }
 
-// button state change interrupt
+// button and serial state change interrupt
 ISR(PCINT0_vect) 
 { 
-	if (hibernating)
+	// start of serial input?
+	if (bit_is_clear(PINB, PB4))
+	{
+		// if hibernating, wake up
+		/*if (hibernating)
+		{
+			lastButtonTime = (clock_elapsedQuarterSeconds<<8) | TCNT2;
+			hibernating = 0;
+			// put LCD in normal mode
+			LcdPowerSave(0);
+			screenClearNeeded = 1;
+			screenUpdateNeeded = 1;
+			unlockState = 1;
+		}
+		*/
+		SerialDoCommand();
+		return;
+	}
+	
+	if (hibernating &&
+		(bit_is_clear(PINB, BUTTON_NEXT) || bit_is_clear(PINB, BUTTON_PREV) || bit_is_clear(PINB, BUTTON_SELECT)))
 	{
 		// ignore button press, exit hibernation, wake screen and backlight
 		lastButtonTime = (clock_elapsedQuarterSeconds<<8) | TCNT2;

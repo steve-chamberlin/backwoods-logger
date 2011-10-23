@@ -158,10 +158,19 @@
     <Compile Include="bmp085.c">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="calib_32kHz.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="calib_values.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="clock.c">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="clock.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="device_specific.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="glcdfont.c">
@@ -186,6 +195,12 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="sampling.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="serial.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="serial.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="shake.c">

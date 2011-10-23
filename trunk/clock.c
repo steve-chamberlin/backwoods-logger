@@ -71,6 +71,7 @@ int StrToMonth(PGM_P str)
 char* MakeDateString(char* str, uint8_t day, uint8_t month)
 {
 	strcpy_P(str, (PGM_P)pgm_read_word(&monthNames[month-1]));
+	
 	if (day < 10)
 	{
 		strcat_P(str, PSTR(" 0"));
@@ -101,15 +102,8 @@ char* MakeShortTimeString(char* str, uint8_t hour, uint8_t minute)
 	}
 	itoa(minute, &str[strlen(str)], 10);
 	
-	if (hour < 12)
-	{
-		strcat_P(str, PSTR("A"));
-	}
-	else
-	{
-		strcat_P(str, PSTR("P"));
-	}
-
+	strcat_P(str, hour < 12 ? PSTR("A") : PSTR("P"));
+	
 	return str;			
 }	
 
@@ -138,14 +132,7 @@ char* MakeTimeString(char* str, uint8_t hour, uint8_t minute, uint8_t second)
 	}
 	itoa(second, &str[strlen(str)], 10);
 	
-	if (hour < 12)
-	{
-		strcat_P(str, PSTR("A"));
-	}
-	else
-	{
-		strcat_P(str, PSTR("P"));
-	}
+	strcat_P(str, hour < 12 ? PSTR("A") : PSTR("P"));
 
 	return str;			
 }
@@ -240,7 +227,7 @@ char* MakePastTimeString(char* str, uint16_t timeAgo)
 			pastDay = februaryLength;
 		else if (pastMonth == 1 || pastMonth == 3 || pastMonth == 5 || pastMonth == 7 || pastMonth == 8 || pastMonth == 10 || pastMonth == 12)
 			pastDay = 31;
-		else if (pastMonth == 4 || pastMonth == 6 || pastMonth == 9 || pastMonth == 11)
+		else 
 			pastDay = 30;
 	}
 	
@@ -264,7 +251,7 @@ char* MakePastTimeString(char* str, uint16_t timeAgo)
 				pastDay = februaryLength;
 			else if (pastMonth == 1 || pastMonth == 3 || pastMonth == 5 || pastMonth == 7 || pastMonth == 8 || pastMonth == 10 || pastMonth == 12)
 				pastDay = 31;
-			else if (pastMonth == 4 || pastMonth == 6 || pastMonth == 9 || pastMonth == 11)
+			else 
 				pastDay = 30;
 		}
 	}	
@@ -281,7 +268,7 @@ char* MakePastTimeString(char* str, uint16_t timeAgo)
 	return str;
 }
 
-uint8_t Str2ToByte(PGM_P p)
+/*uint8_t Str2ToByte(PGM_P p)
 {
 	uint8_t tensByte = pgm_read_byte(p);
 	uint8_t tens = tensByte == ' ' ? 0 : tensByte - '0';
@@ -289,15 +276,25 @@ uint8_t Str2ToByte(PGM_P p)
 	
 	return tens*10 + ones;	
 }	
+*/
 	
 void ClockInit()
 {
+	/*
 	clock_year = Str2ToByte((PGM_P)&dateStr[9]);
 	clock_month = StrToMonth((PGM_P)&dateStr[0]);
 	clock_day = Str2ToByte((PGM_P)&dateStr[4]);
 	clock_hour = Str2ToByte((PGM_P)&timeStr[0]);
 	clock_minute = Str2ToByte((PGM_P)&timeStr[3]);
 	clock_second = Str2ToByte((PGM_P)&timeStr[6]);
+	*/
+	
+	clock_year = 11;
+	clock_month = 1;
+	clock_day = 1;
+	clock_hour = 0;
+	clock_minute = 0;
+	clock_second = 0;	
 }	
 			
 void ClockTick()
@@ -326,8 +323,9 @@ void ClockTick()
 					uint8_t februaryLength = (clock_year % 4 == 0) ? 29 : 28;
 					
 					if ((clock_month == 2 && clock_day == februaryLength+1) ||
-						((clock_month == 1 || clock_month == 3 || clock_month == 5 || clock_month == 7 || clock_month == 8 || clock_month == 10 || clock_month == 12) && clock_day == 32) ||
-						((clock_month == 4 || clock_month == 6 || clock_month == 9 || clock_month == 11) && clock_day == 31))
+						((clock_month == 4 || clock_month == 6 || clock_month == 9 || clock_month == 11) && clock_day == 31) ||
+						(clock_day == 32)
+						)
 					{
 						clock_day = 1;
 						clock_month++;

@@ -31,6 +31,7 @@ volatile uint8_t graphDrawPoints[GRAPH_COUNT];
 
 inline void ssd1306_write(uint8_t dc, uint8_t c) 
 {  	
+	// unrolled loops for maximum LCD update speed
 	if (dc)
 		OLED_CONTROL_PORT |= (1<<OLED_DC);
 	else

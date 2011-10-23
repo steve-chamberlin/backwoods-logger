@@ -257,24 +257,3 @@ float bmp085GetSeaLevelPressure(float stationPressure, float trueAltitude)
 {
 	return stationPressure / pow((1-trueAltitude/44330), 5.255);
 }
-
-void bmp085GetForecast(float stationPressure, float trueAltitude)
-{
-	const float ePressure = expectedSeaLevelPressure * pow((1-trueAltitude/44330), 5.255);  // expected pressure (in Pa) at altitude
-	float weatherDiff;
-
-	// Add this into loop(), after you've calculated the pressure
-	weatherDiff = stationPressure - ePressure;
-	if(weatherDiff > 250)
-	{
-		//Serial.println("Sunny!");
-	}		
-	else if ((weatherDiff <= 250) || (weatherDiff >= -250))
-	{
-		//Serial.println("Partly Cloudy");
-	}
-	else if (weatherDiff > -250)
-	{
-		//Serial.println("Rain :-(");
-	}
-}

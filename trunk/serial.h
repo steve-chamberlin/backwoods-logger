@@ -13,17 +13,20 @@
   THE PRODUCT OR THE USE OR OTHER DEALINGS IN THE PRODUCT.
 */
 
-#ifndef HIKEA_H_
-#define HIKEA_H_
 
-#include <avr/pgmspace.h>
+#ifndef SERIAL_H_
+#define SERIAL_H_
 
-extern const char dateStr[] PROGMEM;
-extern const char timeStr[] PROGMEM;
+void SerialInit();
+void SerialBegin();
+void SerialEnd();
+void SerialDoCommand();
+void SerialDispatchCommand(uint8_t cmd);
+void SerialSendGraphs();
+void SerialSendSnapshots();
+void SerialSendByte(uint8_t c);
+uint8_t SerialReceiveByte();
 
-extern char versionStr[];
 
-void InitSettings();
-void DrawModeScreen();
 
-#endif /* HIKEA_H_ */
+#endif /* SERIAL_H_ */
