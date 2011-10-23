@@ -27,6 +27,8 @@ A 2N7000 or similar N-channel enhancement mode MOSFET is used to perform level c
 
 A pre-assembled blsync adapter using a custom-made PCB may also be available in the future, for a more finished solution.
 
+The blsync adapter can not be used to update the firmware in the Logger's ATmega microcontroller-- it is only for syncing data from the Logger. Maybe someday...
+
 = Running the Blsync Utility =
 
 Plug the blsync adapter into the Logger's ISP port, and connect the USB-serial cable to the blsync adapter's 6-pin header. Be careful not to insert either one backwards, or you may damage the Logger.
