@@ -15,10 +15,48 @@ Blsync communicates with the Logger using a 5V or 3.3V serial connection. You wi
 
 The Backwoods Logger runs at 3.3V, but because the blsync adapter contains a built-in level-converter, you can use either a 5V or 3.3V USB-Serial cable. 
 
-= Blsync Adapter =
+= Blsync Adapter Construction =
 
 The blsync adapter plugs into the Logger's ISP port, and converts it to a 6-pin serial connector. Only the RXD, TXD, and GND pins from the serial connector are used, and VCC, RTS#, and CTS# are not connected.
+
+You can build a blsync adapter from 0.1" header and a MOSFET, or even just wires on a breadboard.
 
 [http://www.bigmessowires.com/blsync-schematic.png]
 
 A 2N7000 or similar N-channel enhancement mode MOSFET is used to perform level conversion on the TX line. If you will always be using a 3.3V USB-serial cable, you can omit the MOSFET and connect TX directly to MISO.
+
+A pre-assembled blsync adapter using a custom-made PCB may also be available in the future, for a more finished solution.
+
+= Running the Blsync Utility =
+
+Plug the blsync adapter into the Logger's ISP port, and connect the USB-serial cable to the blsync adapter's 6-pin header. Be careful not to insert either one backwards, or you may damage the Logger.
+
+Open a command prompt window, and run the blsync.exe program. Under Windows, a command prompt can be opened by:
+
+ * Click the taskbar's Start button (the Windows logo button)
+ * Type "cmd" into the "search programs and files" box, and press Enter.
+
+Blsync can retrieve the Logger's firmware version number, temperature / altitude / pressure graphs, and snapshot list. Data can be saved in CSV format or raw binary.
+
+Blsync needs to know what port to use for Logger communication. When connected to the PC, your USB-serial cable will be assigned a virtual serial port by the OS, such as "COM3". If you don't know what port your USB-serial cable is using, open the Windows Device Manager by going to Control Panels, Hardware and Sound, Device Manager. Under the Ports heading, you should see an entry of "USB Serial Port":
+
+[http://www.bigmessowires.com/usbserial.png]
+
+The blsync utility is configured using command line options:
+
+{{{
+Usage: blsync -p port [-b speed] [-v] [-c] [-r] [-g filename] [-s filename]
+    -p port       Port to use for Logger communication, such as COM1.
+    -b speed      Bit rate for communication. Default is 38400.
+    -v            Display the Logger firmware version number.
+    -c            Save files in CSV format. This is the default.
+    -r            Save files in raw binary format instead of CSV.
+    -g filename   Sync the graph data, and save it to the named file.
+    -s filename   Sync the snapshot data, and save it to the named file.
+}}}
+
+For example, to sync the temperature, altitude, and pressure graphs from the Logger connected to COM3, and save them in CSV format to the file graphs.csv, the command line would be:
+
+{{{
+blsync.exe -p COM3 -c -g graphs.csv
+}}}
