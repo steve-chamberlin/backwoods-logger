@@ -17,4 +17,8 @@ The Backwoods Logger runs at 3.3V, but because the blsync adapter contains a bui
 
 = Blsync Adapter =
 
-The blsync adapter plugs into the Logger's ISP port, and converts it to a 6-pin serial connector.
+The blsync adapter plugs into the Logger's ISP port, and converts it to a 6-pin serial connector. Only the RXD, TXD, and GND pins from the serial connector are used, and VCC, RTS#, and CTS# are not connected.
+
+[http://www.bigmessowires.com/blsync-schematic.png]
+
+A 2N7000 or similar N-channel enhancement mode MOSFET is used to perform level conversion on the TX line. If you will always be using a 3.3V USB-serial cable, you can omit the MOSFET and connect TX directly to MISO.
