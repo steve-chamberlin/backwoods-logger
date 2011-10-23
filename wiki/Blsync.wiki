@@ -38,7 +38,7 @@ Open a command prompt window, and run the blsync.exe program. Under Windows, a c
  * Click the taskbar's Start button (the Windows logo button)
  * Type "cmd" into the "search programs and files" box, and press Enter.
 
-Blsync can retrieve the Logger's firmware version number, temperature / altitude / pressure graphs, and snapshot list. Data can be saved in CSV format or raw binary.
+Blsync can retrieve the Logger's firmware version number, temperature / altitude / pressure graphs, and snapshot list. Data can be saved in CSV format for importing into Excel, or as raw binary.
 
 The blsync utility is configured using command line options:
 
