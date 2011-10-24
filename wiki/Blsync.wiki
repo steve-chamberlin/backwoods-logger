@@ -58,3 +58,7 @@ For example, to sync the temperature, altitude, and pressure graphs from the Log
 {{{
 blsync.exe -p COM3 -c -g graphs.csv
 }}}
+
+By importing the CSV file into Excel or another analysis program, you can quickly create graphs such as this 40 hour temperature / pressure profile:
+
+[http://www.bigmessowires.com/blsync-graph.jpg]
