@@ -14,7 +14,7 @@ Blsync communicates with the Logger using a 5V or 3.3V serial connection. You wi
  * [http://www.sparkfun.com/products/9717 Sparkfun FTDI Cable 3.3V]
 
 The Backwoods Logger runs at 3.3V, but because the blsync adapter contains a built-in level-converter, you can use either a 5V or 3.3V USB-Serial cable. 
-
+ 
 = Blsync Adapter Construction =
 
 The blsync adapter plugs into the Logger's ISP port, and converts it to a 6-pin serial connector. Only the RXD, TXD, and GND pins from the serial connector are used, and VCC, RTS#, and CTS# are not connected.
