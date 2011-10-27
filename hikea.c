@@ -978,6 +978,7 @@ int main(void)
 	// calibrate the internal RC oscillator
 	PerformCalibration();
 	// do it twice, because on reset immediately after programming, it always seems to get a bogus result
+	_delay_ms(1);
 	PerformCalibration(); 
 	
 	sei();	

@@ -42,6 +42,8 @@ inline void ssd1306_write(uint8_t dc, uint8_t c)
 #if 0	  
 	for (uint8_t i = 0; i < 8; i++)  
 	{						
+		OLED_DATA_PORT &= ~(1<<OLED_CLK); 
+		
 		if (c & 0x80)
 			OLED_DATA_PORT |= (1<<OLED_MOSI);
 		else
@@ -49,82 +51,80 @@ inline void ssd1306_write(uint8_t dc, uint8_t c)
 			
 		c <<= 1;
 					
-		OLED_DATA_PORT |= (1<<OLED_CLK); 		
-		OLED_DATA_PORT &= ~(1<<OLED_CLK); 			
+		OLED_DATA_PORT |= (1<<OLED_CLK); 			
 	}
 #else
 	if (c)
 	{
 		uint8_t mask = 0x80;
 	
+		OLED_DATA_PORT &= ~(1<<OLED_CLK); 
 		if (c & mask)
 			OLED_DATA_PORT |= (1<<OLED_MOSI);
 		else
 			OLED_DATA_PORT &= ~(1<<OLED_MOSI);
-		OLED_DATA_PORT |= (1<<OLED_CLK); 		
-		OLED_DATA_PORT &= ~(1<<OLED_CLK); 		
+		OLED_DATA_PORT |= (1<<OLED_CLK); 				
 		c <<= 1;
 		
+		OLED_DATA_PORT &= ~(1<<OLED_CLK); 
 		if (c & mask)
 			OLED_DATA_PORT |= (1<<OLED_MOSI);
 		else
 			OLED_DATA_PORT &= ~(1<<OLED_MOSI);
 		OLED_DATA_PORT |= (1<<OLED_CLK); 		
-		OLED_DATA_PORT &= ~(1<<OLED_CLK); 	
 		c <<= 1;
 	
+		OLED_DATA_PORT &= ~(1<<OLED_CLK); 
 		if (c & mask)
 			OLED_DATA_PORT |= (1<<OLED_MOSI);
 		else
 			OLED_DATA_PORT &= ~(1<<OLED_MOSI);
-		OLED_DATA_PORT |= (1<<OLED_CLK); 		
-		OLED_DATA_PORT &= ~(1<<OLED_CLK); 		
+		OLED_DATA_PORT |= (1<<OLED_CLK); 			
 		c <<= 1;
 		
+		OLED_DATA_PORT &= ~(1<<OLED_CLK); 
 		if (c & mask)
 			OLED_DATA_PORT |= (1<<OLED_MOSI);
 		else
 			OLED_DATA_PORT &= ~(1<<OLED_MOSI);
 		OLED_DATA_PORT |= (1<<OLED_CLK); 		
-		OLED_DATA_PORT &= ~(1<<OLED_CLK); 	
 		c <<= 1;
 	
+		OLED_DATA_PORT &= ~(1<<OLED_CLK); 
 		if (c & mask)
 			OLED_DATA_PORT |= (1<<OLED_MOSI);
 		else
 			OLED_DATA_PORT &= ~(1<<OLED_MOSI);
-		OLED_DATA_PORT |= (1<<OLED_CLK); 		
-		OLED_DATA_PORT &= ~(1<<OLED_CLK); 		
+		OLED_DATA_PORT |= (1<<OLED_CLK); 			
 		c <<= 1;
 		
+		OLED_DATA_PORT &= ~(1<<OLED_CLK); 
 		if (c & mask)
 			OLED_DATA_PORT |= (1<<OLED_MOSI);
 		else
 			OLED_DATA_PORT &= ~(1<<OLED_MOSI);
 		OLED_DATA_PORT |= (1<<OLED_CLK); 		
-		OLED_DATA_PORT &= ~(1<<OLED_CLK); 	
 		c <<= 1;
 	
+		OLED_DATA_PORT &= ~(1<<OLED_CLK); 
 		if (c & mask)
 			OLED_DATA_PORT |= (1<<OLED_MOSI);
 		else
 			OLED_DATA_PORT &= ~(1<<OLED_MOSI);
-		OLED_DATA_PORT |= (1<<OLED_CLK); 		
-		OLED_DATA_PORT &= ~(1<<OLED_CLK); 		
+		OLED_DATA_PORT |= (1<<OLED_CLK); 		 		
 		c <<= 1;
 		
+		OLED_DATA_PORT &= ~(1<<OLED_CLK); 
 		if (c & mask)
 			OLED_DATA_PORT |= (1<<OLED_MOSI);
 		else
 			OLED_DATA_PORT &= ~(1<<OLED_MOSI);
 		OLED_DATA_PORT |= (1<<OLED_CLK); 		
-		OLED_DATA_PORT &= ~(1<<OLED_CLK); 	
 		c <<= 1;
 	}
 	else
 	{
 		OLED_DATA_PORT &= ~(1<<OLED_MOSI);
-		OLED_DATA_PORT |= (1<<OLED_CLK); 		
 		OLED_DATA_PORT &= ~(1<<OLED_CLK); 
 		OLED_DATA_PORT |= (1<<OLED_CLK); 		
 		OLED_DATA_PORT &= ~(1<<OLED_CLK); 
@@ -140,10 +140,14 @@ inline void ssd1306_write(uint8_t dc, uint8_t c)
 		OLED_DATA_PORT &= ~(1<<OLED_CLK); 
 		OLED_DATA_PORT |= (1<<OLED_CLK); 		
 		OLED_DATA_PORT &= ~(1<<OLED_CLK); 
+		OLED_DATA_PORT |= (1<<OLED_CLK); 		
 	}			
 #endif
 		
 	OLED_CONTROL_PORT |= (1<<OLED_CS);
+	
+	// leave data pin high
+	OLED_DATA_PORT |= (1<<OLED_MOSI);
 }
 
 void ssd1306_init() 
@@ -246,6 +250,7 @@ void ssd1306_clear()
 	{
 		for (uint8_t x=0; x<SSD1306_WIDTH; x++)
 		{
+			OLED_DATA_PORT &= ~(1<<OLED_CLK);
 			OLED_DATA_PORT |= (1<<OLED_CLK); 		
 			OLED_DATA_PORT &= ~(1<<OLED_CLK); 
 			OLED_DATA_PORT |= (1<<OLED_CLK); 		
@@ -260,12 +265,14 @@ void ssd1306_clear()
 			OLED_DATA_PORT &= ~(1<<OLED_CLK); 
 			OLED_DATA_PORT |= (1<<OLED_CLK); 		
 			OLED_DATA_PORT &= ~(1<<OLED_CLK); 
-			OLED_DATA_PORT |= (1<<OLED_CLK); 		
-			OLED_DATA_PORT &= ~(1<<OLED_CLK); 			
+			OLED_DATA_PORT |= (1<<OLED_CLK); 		 			
 		}
 	}
 	
 	OLED_CONTROL_PORT |= (1<<OLED_CS);
+	
+	// leave data pin high
+	OLED_DATA_PORT |= (1<<OLED_MOSI);
 }
 
 void ssd1306_goto(uint8_t x, uint8_t y)
