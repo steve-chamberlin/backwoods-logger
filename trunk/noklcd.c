@@ -249,6 +249,8 @@ void LcdWrite(uint8_t dc, uint8_t data)
 
 	for (int i = 0; i < 8; i++)  
 	{						
+		PORTB &= ~(1<<LCD_PIN_SCLK); 	
+		
 		if (data & 0x80)
 			PORTB |= (1<<LCD_PIN_SDIN);
 		else
@@ -257,10 +259,12 @@ void LcdWrite(uint8_t dc, uint8_t data)
 		data <<= 1;
 					
 		PORTB |= (1<<LCD_PIN_SCLK); 		
-		PORTB &= ~(1<<LCD_PIN_SCLK); 			
 	}
 
 	PORTD |= (1<<LCD_PIN_SCE);
+	
+	// leave data pin high
+	PORTB |= (1<<LCD_PIN_SDIN);
 }
 
 void LcdGoto(int x, int y)
