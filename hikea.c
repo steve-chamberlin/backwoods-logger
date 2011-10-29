@@ -43,12 +43,11 @@
 #include "speaker.h"
 #include "serial.h"
 
-// Atmel's calib_32kHz.c file has no header
-void PerformCalibration(void);
-
 #define BUTTON_NEXT PB0
 #define BUTTON_SELECT PB1
 #define BUTTON_PREV PB2
+
+#define INVALID_RATE 0x7FFFFFFF
 
 uint8_t sleepDelay;
 
@@ -150,27 +149,45 @@ const char* altitudeMenu[] PROGMEM = {
 enum {
 	MENU_SYSTEM_EXIT_MENU = 0,
 	MENU_SYSTEM_DATE_TIME,
+	MENU_SYSTEM_UNITS,
 	MENU_SYSTEM_SLEEP_DELAY,
 	MENU_SYSTEM_SOUND,
 	MENU_SYSTEM_LCD_CONTRAST,
+#ifdef LOGGER_CLASSIC	
 	MENU_SYSTEM_LCD_BIAS,
 	MENU_SYSTEM_LCD_TEMP_COEF,
+#endif	
 	MENU_SYSTEM_RESTORE_DEFAULTS,
 	MENU_SYSTEM_ERASE_ALL_GRAPHS,
 	MENU_SYSTEM_COUNT
 };
 
 const char system1[] PROGMEM = "Date and Time";
-const char system2[] PROGMEM = "Sleep Delay";
-const char system3[] PROGMEM = "Sound";
-const char system4[] PROGMEM = "LCD Contrast";
-const char system5[] PROGMEM = "LCD Bias";
-const char system6[] PROGMEM = "LCD Temp Coef";
-const char system7[] PROGMEM = "Restore Defaults";
-const char system8[] PROGMEM = "Erase All Data";
+const char system2[] PROGMEM = "Measurement Units";
+const char system3[] PROGMEM = "Sleep Delay";
+const char system4[] PROGMEM = "Sound";
+const char system5[] PROGMEM = "LCD Contrast";
+#ifdef LOGGER_CLASSIC
+const char system6[] PROGMEM = "LCD Bias";
+const char system7[] PROGMEM = "LCD Temp Coef";
+#endif
+const char system8[] PROGMEM = "Restore Defaults";
+const char system9[] PROGMEM = "Erase All Data";
 
 const char* systemMenu[] PROGMEM = { 
-	exitMenu, system1, system2, system3, system4, system5, system6, system7, system8, NULL 
+	exitMenu, 
+	system1, 
+	system2, 
+	system3, 
+	system4, 
+	system5, 
+#ifdef LOGGER_CLASSIC	
+	system6, 
+	system7, 
+#endif	
+	system8, 
+	system9, 
+	NULL 
 };
 
 // pre-baked version number string
@@ -295,7 +312,7 @@ uint8_t grandparentMode;
 int16_t enterNumberMax;
 int16_t enterNumberMin;
 int16_t enterNumberValue;
-char* enterNumberUnits;
+PGM_P enterNumberUnits;
 char* enterNumberPrompt;
 
 char* choicePrompt;
@@ -305,12 +322,12 @@ char* choice2;
 void DrawMenu()
 {
 #ifdef SSD1306_LCD
-	const int menuLines = 7;
-	const int charWidth = 6;
+	const uint8_t menuLines = 7;
+	const uint8_t charWidth = 6;
 #endif
 #ifdef NOKIA_LCD
-	const int menuLines = 5;
-	const int charWidth = 4;
+	const uint8_t menuLines = 5;
+	const uint8_t charWidth = 4;
 #endif	
 	const char** menu = modeMenus[mode];
 	uint8_t numMenuItems = 0;
@@ -324,7 +341,7 @@ void DrawMenu()
 		const char* pMenuItem = (PGM_P)pgm_read_word(&menu[topMenuItemIndex+i]);
 		
 		// special case for Set/Reset Altitude Destination menu item
-		if (mode == MODE_ALTITUDE_INFO && topMenuItemIndex+i == MENU_ALTITUDE_SET_GOAL && altitudeDestination != 0x7FFF)
+		if (mode == MODE_ALTITUDE_INFO && topMenuItemIndex+i == MENU_ALTITUDE_SET_GOAL && altitudeDestination != INVALID_SAMPLE)
 		{
 			pMenuItem = altitude2a;
 		}	
@@ -334,18 +351,18 @@ void DrawMenu()
 		{	
 			uint8_t graphType = parentMode == MODE_ALTITUDE_GRAPH ? GRAPH_ALTITUDE : parentMode == MODE_TEMP_GRAPH ? GRAPH_TEMPERATURE : GRAPH_PRESSURE;
 			
-			if (topMenuItemIndex+i == MENU_GRAPH_YAXIS_MIN && graphYMin[graphType] != 0x7FFF)
+			if (topMenuItemIndex+i == MENU_GRAPH_YAXIS_MIN && graphYMin[graphType] != INVALID_SAMPLE)
 			{
 				pMenuItem = graph3a;
 			}
-			if (topMenuItemIndex+i == MENU_GRAPH_YAXIS_MAX && graphYMax[graphType] != 0x7FFF)
+			if (topMenuItemIndex+i == MENU_GRAPH_YAXIS_MAX && graphYMax[graphType] != INVALID_SAMPLE)
 			{
 				pMenuItem = graph4a;
 			}
 		}
 						
 		LcdGoto(0, i+1);
-		for (int j=0; j<LCD_WIDTH; j++)
+		for (uint8_t j=0; j<LCD_WIDTH; j++)
 		{
 			LcdWrite(LCD_DATA, topMenuItemIndex+i == selectedMenuItemIndex ? 0x7F : 0x00);
 		}
@@ -442,7 +459,7 @@ void HandleSetTimePrevNext(uint8_t step)
 	}	
 }	
 
-void StartEnterNumber(int16_t vMin, int16_t vMax, int16_t value, char* units)
+void StartEnterNumber(int16_t vMin, int16_t vMax, int16_t value, PGM_P units)
 {
 	parentMode = mode;
 	enterNumberMax = vMax;
@@ -467,22 +484,34 @@ void HandleEnterNumberSelect()
 	}
 	else if (parentMode == MODE_ALTITUDE_INFO)
 	{
+		if (!useImperialUnits)
+		{
+			// convert the entered value from meters to feet
+			enterNumberValue = 3.28f * (0.5f + enterNumberValue);
+		}
+				
 		switch (selectedMenuItemIndex)
 		{
 			case MENU_ALTITUDE_CALIBRATE:
 				expectedSeaLevelPressure = bmp085GetSeaLevelPressure((float)last_pressure, 0.3048f * enterNumberValue);
-				last_altitude = (3.2808399f * bmp085GetAltitude((float)last_pressure));		
+				last_altitude = 3.28f * bmp085GetAltitude((float)last_pressure);		
 				// last_altitude should now equal enterNumberValue
 				last_calibration_altitude = enterNumberValue;
 				break;						
 				
-			case MENU_ALTITUDE_SET_GOAL:
+			case MENU_ALTITUDE_SET_GOAL:		
 				altitudeDestination = enterNumberValue;
 				break;			
 		}
 	}
 	else if (grandparentMode == MODE_ALTITUDE_GRAPH)
 	{
+		if (!useImperialUnits)
+		{
+			// convert the entered value from meters to feet
+			enterNumberValue = 3.28f * (0.5f + enterNumberValue);
+		}
+				
 		switch (selectedMenuItemIndex)
 		{
 			case MENU_GRAPH_YAXIS_MIN:
@@ -496,6 +525,17 @@ void HandleEnterNumberSelect()
 	}
 	else if (grandparentMode == MODE_TEMP_GRAPH)
 	{
+		if (useImperialUnits)
+		{
+			// convert the entered value to half degrees F
+			enterNumberValue *= 2;
+		}
+		else
+		{
+			// convert the entered value from C to half degrees F
+			enterNumberValue = ((enterNumberValue * 2 * 9) + 2) / 5 + (2 * 32);
+		}
+				
 		switch (selectedMenuItemIndex)
 		{
 			case MENU_GRAPH_YAXIS_MIN:
@@ -509,6 +549,17 @@ void HandleEnterNumberSelect()
 	}
 	else if (grandparentMode == MODE_PRESSURE_GRAPH)
 	{
+		if (useImperialUnits)
+		{
+			// convert the entered value from inches of mercury to half millibars
+			enterNumberValue *= 2*33.86389f;
+		}
+		else
+		{
+			// convert the entered value to half millibars
+			enterNumberValue *= 2;
+		}
+				
 		switch (selectedMenuItemIndex)
 		{
 			case MENU_GRAPH_YAXIS_MIN:
@@ -618,6 +669,7 @@ void HandleChoiceSelect()
 					LcdReset(); // should probably set a flag and do this in the main loop. will cause problems if reset while writing to LCD
 					InitSettings();
 					soundEnable = 1;
+					useImperialUnits = 3;
 					bmp085Reset();
 					last_calibration_altitude = 0;
 				}				
@@ -626,6 +678,10 @@ void HandleChoiceSelect()
 			case MENU_SYSTEM_SOUND:
 				soundEnable = 1 - subMenuItemIndex;
 				break;
+				
+			case MENU_SYSTEM_UNITS:
+				useImperialUnits = 3 * (1 - subMenuItemIndex);
+				break;	
 		}
 	}
 	else if (grandparentMode == MODE_ALTITUDE_GRAPH)
@@ -676,26 +732,31 @@ void HandleMenuItem()
 				}
 				break;
 				
+			case MENU_SYSTEM_UNITS:
+				Start2Choice("", "Imperial", "Metric");
+				subMenuItemIndex = (useImperialUnits ? 0 : 1);				
+				break;
+					
 			case MENU_SYSTEM_SLEEP_DELAY:
 				StartEnterNumber(0, 120, sleepDelay, "s");
 				break;
 
 #ifdef NOKIA_LCD				
 			case MENU_SYSTEM_LCD_CONTRAST:
-				StartEnterNumber(0, 100, (lcd_vop & 0x7F) - 27, "");
+				StartEnterNumber(0, 100, (lcd_vop & 0x7F) - 27, NULL);
 				break;
 				
 			case MENU_SYSTEM_LCD_BIAS:
-				StartEnterNumber(0, 7, (lcd_bias & 0x07), "");
+				StartEnterNumber(0, 7, (lcd_bias & 0x07), NULL);
 				break;
 				
 			case MENU_SYSTEM_LCD_TEMP_COEF:
-				StartEnterNumber(0, 3, (lcd_tempCoef & 0x03), "");
+				StartEnterNumber(0, 3, (lcd_tempCoef & 0x03), NULL);
 				break;
 #endif	
 #ifdef SSD1306_LCD
 			case MENU_SYSTEM_LCD_CONTRAST:
-				StartEnterNumber(0, 255, lcd_contrast, "");
+				StartEnterNumber(0, 255, lcd_contrast, NULL);
 				break;
 #endif			
 			case MENU_SYSTEM_RESTORE_DEFAULTS:
@@ -717,20 +778,34 @@ void HandleMenuItem()
 		switch (selectedMenuItemIndex)
 		{
 			case MENU_ALTITUDE_CALIBRATE:
-				StartEnterNumber(-1000, 15000, last_altitude + 0.5f, "ft");
+			{	
+				int16_t refAltitude = last_altitude + 0.5f;
+				if (!useImperialUnits)
+				{
+					// convert the start value number from feet to meters
+					refAltitude = ((long)refAltitude * 100) / 328;
+				}
+				StartEnterNumber(minDataValues[useImperialUnits + GRAPH_ALTITUDE], maxDataValues[useImperialUnits + GRAPH_ALTITUDE], refAltitude, &unitStrings[useImperialUnits + GRAPH_ALTITUDE][1]);
 				enterNumberPrompt = "Current True Altitude";
 				break;
+			}
 				
 			case MENU_ALTITUDE_SET_GOAL:
-				if (altitudeDestination != 0x7FFF)
+				if (altitudeDestination != INVALID_SAMPLE)
 				{
-					altitudeDestination = 0x7FFF;
+					altitudeDestination = INVALID_SAMPLE;
 					menuLevel = 0;
 					screenClearNeeded = 1;
 				}
 				else
 				{
-					StartEnterNumber(-1000, 15000, last_altitude + 0.5f, "ft");
+					int16_t refAltitude = last_altitude + 0.5f;
+					if (!useImperialUnits)
+					{
+						// convert the start value number from feet to meters
+						refAltitude = ((long)refAltitude * 100) / 328;
+					}			
+					StartEnterNumber(minDataValues[useImperialUnits + GRAPH_ALTITUDE], maxDataValues[useImperialUnits + GRAPH_ALTITUDE], refAltitude, &unitStrings[useImperialUnits + GRAPH_ALTITUDE][1]);
 				}
 				break;
 		}					
@@ -813,44 +888,62 @@ void HandleMenuItem()
 			case MENU_GRAPH_YAXIS_MIN:
 				if (parentMode == MODE_TEMP_GRAPH)
 				{
-					if (graphYMin[GRAPH_TEMPERATURE] != 0x7FFF)
+					if (graphYMin[GRAPH_TEMPERATURE] != INVALID_SAMPLE)
 					{
-						graphYMin[GRAPH_TEMPERATURE] = 0x7FFF;
+						graphYMin[GRAPH_TEMPERATURE] = INVALID_SAMPLE;
 						menuLevel = 0;
 						mode = parentMode;
 						screenClearNeeded = 1;
 					}
 					else
 					{
-						StartEnterNumber(-10, 118, graphCurrentYMin, "'F");
+						int16_t refValue = graphCurrentYMin;
+						if (!useImperialUnits)
+						{
+							// convert the start value number from F to C
+							refValue = ((refValue - 32) * 5) / 9;
+						}
+						StartEnterNumber(minDataValues[useImperialUnits + GRAPH_TEMPERATURE], maxDataValues[useImperialUnits + GRAPH_TEMPERATURE], refValue, unitStrings[useImperialUnits + GRAPH_TEMPERATURE]);
 					}		
 				}					
 				else if (parentMode == MODE_ALTITUDE_GRAPH)
 				{
-					if (graphYMin[GRAPH_ALTITUDE] != 0x7FFF)
+					if (graphYMin[GRAPH_ALTITUDE] != INVALID_SAMPLE)
 					{
-						graphYMin[GRAPH_ALTITUDE] = 0x7FFF;
+						graphYMin[GRAPH_ALTITUDE] = INVALID_SAMPLE;
 						menuLevel = 0;
 						mode = parentMode;
 						screenClearNeeded = 1;
 					}
 					else
 					{
-						StartEnterNumber(-1384, 15000, graphCurrentYMin, "ft");
+						int16_t refValue = graphCurrentYMin;
+						if (!useImperialUnits)
+						{
+							// convert the start value number from feet to meters
+							refValue = 0.3048f * refValue;
+						}						
+						StartEnterNumber(minDataValues[useImperialUnits + GRAPH_ALTITUDE], maxDataValues[useImperialUnits + GRAPH_ALTITUDE], refValue, &unitStrings[useImperialUnits + GRAPH_ALTITUDE][1]);
 					}						
 				}
 				else if (parentMode == MODE_PRESSURE_GRAPH)
 				{
-					if (graphYMin[GRAPH_PRESSURE] != 0x7FFF)
+					if (graphYMin[GRAPH_PRESSURE] != INVALID_SAMPLE)
 					{
-						graphYMin[GRAPH_PRESSURE] = 0x7FFF;
+						graphYMin[GRAPH_PRESSURE] = INVALID_SAMPLE;
 						menuLevel = 0;
 						mode = parentMode;
 						screenClearNeeded = 1;
 					}
 					else
 					{
-						StartEnterNumber(5, 37, graphCurrentYMin, "in");
+						int16_t refValue = graphCurrentYMin;
+						if (!useImperialUnits)
+						{
+							// convert the start value number from inches of mercury to millibars
+							refValue = 33.86389f * refValue;
+						}							
+						StartEnterNumber(minDataValues[useImperialUnits + GRAPH_PRESSURE], maxDataValues[useImperialUnits + GRAPH_PRESSURE], refValue, &unitStrings[useImperialUnits + GRAPH_PRESSURE][1]);
 					}						
 				}
 				break;
@@ -858,44 +951,62 @@ void HandleMenuItem()
 			case MENU_GRAPH_YAXIS_MAX:
 				if (parentMode == MODE_TEMP_GRAPH)
 				{
-					if (graphYMax[GRAPH_TEMPERATURE] != 0x7FFF)
+					if (graphYMax[GRAPH_TEMPERATURE] != INVALID_SAMPLE)
 					{
-						graphYMax[GRAPH_TEMPERATURE] = 0x7FFF;
+						graphYMax[GRAPH_TEMPERATURE] = INVALID_SAMPLE;
 						menuLevel = 0;
 						mode = parentMode;
 						screenClearNeeded = 1;
 					}
 					else
 					{
-						StartEnterNumber(-10, 118, graphCurrentYMax, "'F");
+						int16_t refValue = graphCurrentYMax;
+						if (!useImperialUnits)
+						{
+							// convert the start value number from F to C
+							refValue = ((refValue - 32) * 5) / 9;
+						}
+						StartEnterNumber(minDataValues[useImperialUnits + GRAPH_TEMPERATURE], maxDataValues[useImperialUnits + GRAPH_TEMPERATURE], refValue, unitStrings[useImperialUnits + GRAPH_TEMPERATURE]);
 					}						
 				}
 				else if (parentMode == MODE_ALTITUDE_GRAPH)
 				{
-					if (graphYMax[GRAPH_ALTITUDE] != 0x7FFF)
+					if (graphYMax[GRAPH_ALTITUDE] != INVALID_SAMPLE)
 					{
-						graphYMax[GRAPH_ALTITUDE] = 0x7FFF;
+						graphYMax[GRAPH_ALTITUDE] = INVALID_SAMPLE;
 						menuLevel = 0;
 						mode = parentMode;
 						screenClearNeeded = 1;
 					}
 					else
 					{
-						StartEnterNumber(-1384, 15000, graphCurrentYMax, "ft");
+						int16_t refValue = graphCurrentYMax;
+						if (!useImperialUnits)
+						{
+							// convert the start value number from feet to meters
+							refValue = 0.3048f * refValue;
+						}						
+						StartEnterNumber(minDataValues[useImperialUnits + GRAPH_ALTITUDE], maxDataValues[useImperialUnits + GRAPH_ALTITUDE], refValue, &unitStrings[useImperialUnits + GRAPH_ALTITUDE][1]);
 					}						
 				}
 				else if (parentMode == MODE_PRESSURE_GRAPH)
 				{
-					if (graphYMax[GRAPH_PRESSURE] != 0x7FFF)
+					if (graphYMax[GRAPH_PRESSURE] != INVALID_SAMPLE)
 					{
-						graphYMax[GRAPH_PRESSURE] = 0x7FFF;
+						graphYMax[GRAPH_PRESSURE] = INVALID_SAMPLE;
 						menuLevel = 0;
 						mode = parentMode;
 						screenClearNeeded = 1;
 					}
 					else
 					{
-						StartEnterNumber(5, 37, graphCurrentYMax, "in");			
+						int16_t refValue = graphCurrentYMax;
+						if (!useImperialUnits)
+						{
+							// convert the start value number from inches of mercury to millibars
+							refValue = 33.86389f * refValue;
+						}						
+						StartEnterNumber(minDataValues[useImperialUnits + GRAPH_PRESSURE], maxDataValues[useImperialUnits + GRAPH_PRESSURE], refValue, &unitStrings[useImperialUnits + GRAPH_PRESSURE][1]);			
 					}						
 				}
 				break;
@@ -906,10 +1017,10 @@ void HandleMenuItem()
 void HandleMenuPrevNext(uint8_t step)
 {
 #ifdef SSD1306_LCD
-	const int menuLines = 7;
+	const uint8_t menuLines = 7;
 #endif
 #ifdef NOKIA_LCD
-	const int menuLines = 5;
+	const uint8_t menuLines = 5;
 #endif
 	
 	const char** menu = modeMenus[mode];
@@ -939,7 +1050,7 @@ void HandleMenuPrevNext(uint8_t step)
 void InitSettings()
 {
 	sleepDelay = 20;
-	altitudeDestination = 0x7FFF;	
+	altitudeDestination = INVALID_SAMPLE;	
 	
 	mainScreenDataType[0] = MENU_DATA_ALTITUDE;
 	mainScreenDataType[1] = MENU_DATA_TEMP;
@@ -975,12 +1086,6 @@ int main(void)
 	ShakeInit();
 #endif
 	
-	// calibrate the internal RC oscillator
-	PerformCalibration();
-	// do it twice, because on reset immediately after programming, it always seems to get a bogus result
-	_delay_ms(1);
-	PerformCalibration(); 
-	
 	sei();	
 	
 	uint8_t try = 0;
@@ -1004,7 +1109,7 @@ int main(void)
 			try++;
 		}	
 	} while (bmpError != 0);
-			
+	
 	// initialize timer 2 to use an external 32768 Hz crystal 
     ASSR |= (1 << AS2); // use TOSC1/TOSC2 oscillator as timer 2 clock	
 	ASSR &= ~(1 << EXCLK); // use a crystal oscillator rather than an external clock
@@ -1024,7 +1129,7 @@ int main(void)
 				
 	// disable unused peripherals
 	PRR |= (1<<PRTWI) | (1<<PRSPI) | (1<<PRTIM1) | (1<<PRTIM0) | (1<<PRUSART0) | (1<<PRADC);
-
+	
 	// construct the version string
 	uint8_t ind = 0;
 	versionStr[ind++] = pgm_read_byte(&dateStr[9]);
@@ -1052,7 +1157,7 @@ int main(void)
 	versionStr[ind++] = 0;
 		
 	newSampleNeeded = 1;
-			
+					
 	while (1) 
 	{	
 		if (lcdResetNeeded)
@@ -1165,11 +1270,12 @@ long GetRateOfAscent()
 		// compute rate of ascent
 		ratePerMinute = ((long)(last_altitude*100) - pastAltitude) / ascentRateWindow;
 		ratePerMinute = (ratePerMinute + 50) / 100;
+				
 		return ratePerMinute;
 	}
 	else
 	{
-		return 0x7FFFFFFF;
+		return INVALID_RATE;
 	}	
 }
 
@@ -1187,16 +1293,15 @@ long GetTemperatureTrend()
 	long ratePerHour = 0;
 	if (pPastSample->temperature)
 	{	
-		long pastTemperature = 5L * SAMPLE_TO_TEMPERATURE(pPastSample->temperature);
+		long pastTemperature = SAMPLE_TO_TEMPERATURE(pPastSample->temperature);
 				
-		// compute rate of change
-		short tempf = (last_temperature * 9) / 5 + 320;
-		ratePerHour = 60 * (tempf - pastTemperature) / window;
+		// compute rate of change 
+		ratePerHour = 60 * (last_temperature - pastTemperature) / window;
 		return ratePerHour;
 	}
 	else
 	{
-		return 0x7FFFFFFF;
+		return INVALID_RATE;
 	}
 }
 
@@ -1223,7 +1328,7 @@ long GetPressureTrend1()
 	}
 	else
 	{
-		return 0x7FFFFFFF;
+		return INVALID_RATE;
 	}
 }
 
@@ -1251,14 +1356,14 @@ long GetPressureTrend5()
 	}
 	else
 	{
-		return 0x7FFFFFFF;
+		return INVALID_RATE;
 	}
 }
 
 uint8_t GetPressureChangeType(long mbX100PerHour)
 {
 	uint8_t pressureChange;
-	if (mbX100PerHour == 0x7FFFFFFF)
+	if (mbX100PerHour == INVALID_RATE)
 	{
 		pressureChange = CHANGE_STEADY;
 	}
@@ -1319,45 +1424,25 @@ void MakeDataString(char* str, uint8_t dataType)
 			break;
 			
 		case MENU_DATA_TEMP:
-		{
-			short tempf = (last_temperature * 9) / 5 + 320;	
-			//sprintf(str, "%d.%d`F", tempf/10, abs(tempf)%10);
-			dtostrf((double)tempf/10, 1, 1, str);
-			strcat(str, "`F");
-		}		
+			MakeSampleValueAndUnitsString(str, GRAPH_TEMPERATURE, last_temperature);		
 			break;
 			
 		case MENU_DATA_ALTITUDE:
-		{
-			long altitude = (long)(last_altitude*100);
-			//sprintf(str, "%ld.%ld ft", altitude/100, labs(altitude)%100);
-			dtostrf((double)altitude/100, 1, 2, str);
-			strcat(str, " ft");
-		}			
+			MakeSampleValueAndUnitsString(str, GRAPH_ALTITUDE, last_altitude + 0.5f);		
 			break;
 			
 		case MENU_DATA_PRESSURE_STATION:
-		{
-			long pressure = 2953L * last_pressure; // 100000 * 0.0295301
-			pressure = pressure / 100000;
-			//sprintf(str, "Station Prs %ld.%ld in", pressure/100, pressure%100);
 			strcpy_P(str, PSTR("Station Prs "));
-			dtostrf((double)pressure/100, 1, 2, &str[strlen(str)]);
-			strcat_P(str, PSTR(" in"));
-		}		
+			MakeSampleValueAndUnitsString(&str[strlen(str)], GRAPH_PRESSURE, (last_pressure + 25) / 50);			
 			break;
 			
 		case MENU_DATA_PRESSURE_SEALEVEL:
 		{
-			float seaLevelPressure = bmp085GetSeaLevelPressure((float)last_pressure, 0.3048f * last_calibration_altitude);
-			long sealLevelLong = 2953L * seaLevelPressure; // 100000 * 0.0295301
-			sealLevelLong = sealLevelLong / 100000;
-			//sprintf(str, "Sea Lev Prs %ld.%ld in", sealLevelLong/100, sealLevelLong%100);
 			strcpy_P(str, PSTR("Sea Lev Prs "));
-			dtostrf((double)sealLevelLong/100, 1, 2, &str[strlen(str)]);
-			strcat_P(str, PSTR(" in"));
-		}		
-			break;			
+			float seaLevelPressure = bmp085GetSeaLevelPressure((float)last_pressure, 0.3048f * last_calibration_altitude);
+			MakeSampleValueAndUnitsString(&str[strlen(str)], GRAPH_PRESSURE, (seaLevelPressure + 25) / 50);
+			break;
+		}	
 				
 		case MENU_DATA_RATE_OF_ASCENT:
 		{
@@ -1372,18 +1457,15 @@ void MakeDataString(char* str, uint8_t dataType)
 				strcpy_P(str, PSTR("Descending "));
 			}	
 			
-			if (rate != 0x7FFFFFFF)		
+			if (rate == INVALID_RATE)		
 			{
-				ltoa(labs(rate), &str[strlen(str)], 10);			
+				rate = 0;
 			}
-			else
-			{
-				strcat_P(str, PSTR("---"));
-			}			
-	
-			strcat_P(str, PSTR(" ft/min"));
-		}					
+			
+			MakeSampleValueAndUnitsString(&str[strlen(str)], GRAPH_ALTITUDE, rate);
+			strcat_P(str, PSTR("/min"));
 			break;
+		}					
 		
 		case MENU_DATA_TIME_TO_DESTINATION:
 		{
@@ -1392,7 +1474,7 @@ void MakeDataString(char* str, uint8_t dataType)
 			strcpy_P(str, PSTR("Time to Dest "));	
 							
 			long timeToGoal = ((altitudeDestination - (long)(last_altitude)) + ratePerMinute/2) / ratePerMinute;
-			if (ratePerMinute == 0x7FFFFFFF || altitudeDestination == 0x7FFF || timeToGoal < 0 || timeToGoal > 24*99 + 59)
+			if (ratePerMinute == INVALID_RATE || altitudeDestination == INVALID_SAMPLE || timeToGoal < 0 || timeToGoal > 24*99 + 59)
 			{
 				strcat_P(str, PSTR("-----"));
 			}			
@@ -1421,17 +1503,17 @@ void MakeDataString(char* str, uint8_t dataType)
 			strcpy_P(str, PSTR("Temp "));
 			long tempPerHour = GetTemperatureTrend(); // last 1 hour
 			uint8_t tempChange;
-			if (tempPerHour > 70)
+			if (tempPerHour > 14)
 			{
 				// 7.1+
 				tempChange = CHANGE_SOARING;
 			}
-			else if (tempPerHour > 40)
+			else if (tempPerHour > 8)
 			{
 				// 4.1 - 7.0
 				tempChange = CHANGE_RISING_QUICKLY;
 			}
-			else if (tempPerHour > 10)
+			else if (tempPerHour > 2)
 			{
 				// 1.1-4.0
 				tempChange = CHANGE_RISING;
@@ -1446,17 +1528,17 @@ void MakeDataString(char* str, uint8_t dataType)
 				// 0
 				tempChange = CHANGE_STEADY;
 			}	
-			else if (tempPerHour > -11)
+			else if (tempPerHour > -3)
 			{
 				// -1.0 to -0.1
 				tempChange = CHANGE_FALLING_SLOWLY;
 			}
-			else if (tempPerHour > -41)
+			else if (tempPerHour > -9)
 			{
 				// -4.0 to -1.1
 				tempChange = CHANGE_FALLING;
 			}
-			else if (tempPerHour > -71)
+			else if (tempPerHour > -15)
 			{
 				// -7.0 to -4.1
 				tempChange = CHANGE_FALLING_QUICKLY;
@@ -1467,7 +1549,7 @@ void MakeDataString(char* str, uint8_t dataType)
 				tempChange = CHANGE_PLUMMETING;
 			}
 			
-			if (tempPerHour != 0x7FFFFFFF)
+			if (tempPerHour != INVALID_RATE)
 			{
 				PGM_P pString = (PGM_P)pgm_read_word(&changeStrings[tempChange]);
 				strcat_P(str, pString);
@@ -1500,7 +1582,7 @@ void MakeDataString(char* str, uint8_t dataType)
 			long mbX100PerHour5 = GetPressureTrend5(); // last 5 hour
 			uint8_t pressureChange5 = GetPressureChangeType(mbX100PerHour5);
 			
-			if (mbX100PerHour1 == 0x7FFFFFFF || mbX100PerHour5 == 0x7FFFFFFF)
+			if (mbX100PerHour1 == INVALID_RATE || mbX100PerHour5 == INVALID_RATE)
 			{
 				strcat_P(str, PSTR("Unavailable"));
 			}
@@ -1634,10 +1716,10 @@ void MakeSnapshotDateString(char* str, uint32_t packedTime)
 
 void MakeSnapshotValueString(char* str, Sample* pSample)
 {
-	MakeSampleValueString(str, GRAPH_ALTITUDE, SAMPLE_TO_ALTITUDE(pSample->altitude));
-	strcat_P(str, PSTR("ft "));
-	MakeSampleValueString(&str[strlen(str)], GRAPH_TEMPERATURE, SAMPLE_TO_TEMPERATURE(pSample->temperature));
-	strcat_P(str, PSTR("F "));
+	MakeSampleValueAndUnitsStringForGraph(str, GRAPH_ALTITUDE, SAMPLE_TO_ALTITUDE(pSample->altitude));
+	strcat_P(str, PSTR(" "));
+	MakeSampleValueAndUnitsStringForGraph(&str[strlen(str)], GRAPH_TEMPERATURE, SAMPLE_TO_TEMPERATURE(pSample->temperature));
+	strcat_P(str, PSTR(" "));
 	MakeSampleValueString(&str[strlen(str)], GRAPH_PRESSURE, SAMPLE_TO_PRESSURE(pSample->pressure));	
 }
 
@@ -1657,7 +1739,7 @@ void DrawSnapshotList()
 	uint8_t numMenuItems = GetNumSnapshots();
 	char str[22];
 	
-	for (int i=0; i<4; i++)
+	for (uint8_t i=0; i<4; i++)
 	{
 		LcdGoto(0, i+1);
 		int entryIndex = newestIndex-topMenuItemIndex-i;
@@ -1682,7 +1764,7 @@ void DrawSnapshotList()
 		LcdWrite(LCD_DATA, topMenuItemIndex+i == selectedMenuItemIndex ? 0x7F : 0x00);
 		MakeSnapshotDateString(str, packedTime);
 		LcdTinyString(str, topMenuItemIndex+i == selectedMenuItemIndex ? TEXT_INVERSE : TEXT_NORMAL);		
-		for (int x=4+(numLen+strlen(str))*4; x<LCD_WIDTH; x++)
+		for (uint8_t x=4+(numLen+strlen(str))*4; x<LCD_WIDTH; x++)
 			LcdWrite(LCD_DATA, topMenuItemIndex+i == selectedMenuItemIndex ? 0x7F : 0x00);
 		
 		// show up/down arrows
@@ -1715,7 +1797,7 @@ void DrawSnapshotList()
 	MakeSnapshotValueString(str, pSample);
 	LcdTinyStringFramed(str);
 	
-	for (int x=1+strlen(str)*4; x<LCD_WIDTH; x++)
+	for (uint8_t x=1+strlen(str)*4; x<LCD_WIDTH; x++)
 		LcdWrite(LCD_DATA, 0x01);	
 }
 
@@ -1776,24 +1858,24 @@ void DrawModeScreen()
 		if (menuLevel == 0)
 		{
 #ifdef NOKIA_LCD					
-			const int cTopLineLen = 14;
-			const int cTopLineHalfChar = 3;
-			const int cBottomLineLen = 21;
-			const int cBottomLineHalfChar = 2;
+			const uint8_t cTopLineLen = 14;
+			const uint8_t cTopLineHalfChar = 3;
+			const uint8_t cBottomLineLen = 21;
+			const uint8_t cBottomLineHalfChar = 2;
 #endif
 #ifdef SSD1306_LCD
-			const int cTopLineLen = 21;
-			const int cTopLineHalfChar = 3;
-			const int cBottomLineLen = 21;
-			const int cBottomLineHalfChar = 3;
+			const uint8_t cTopLineLen = 21;
+			const uint8_t cTopLineHalfChar = 3;
+			const uint8_t cBottomLineLen = 21;
+			const uint8_t cBottomLineHalfChar = 3;
 #endif
 				
-			for (int i=0; i<2; i++)
+			for (uint8_t i=0; i<2; i++)
 			{
 				MakeDataString(str, mainScreenDataType[i]);
 				str[cTopLineLen] = 0;
 				LcdGoto(0,i);
-				for (int j=0; j<LCD_WIDTH; j++)
+				for (uint8_t j=0; j<LCD_WIDTH; j++)
 				{
 					LcdWrite(LCD_DATA, 0x00);
 					
@@ -1802,12 +1884,12 @@ void DrawModeScreen()
 				LcdString(str);
 			}
 			
-			for (int i=2; i<6; i++)
+			for (uint8_t i=2; i<6; i++)
 			{
 				MakeDataString(str, mainScreenDataType[i]);
 				str[cBottomLineLen] = 0;
 				LcdGoto(0,i);
-				for (int j=0; j<LCD_WIDTH; j++)
+				for (uint8_t j=0; j<LCD_WIDTH; j++)
 				{
 					LcdWrite(LCD_DATA, 0x00);
 					
@@ -2077,9 +2159,10 @@ void DrawModeScreen()
 		strcat_P(str, PSTR(" "));			
 		LcdTinyString(str, TEXT_INVERSE);	
 		
-		if (strlen(enterNumberUnits))
+		if (enterNumberUnits)
 		{
-			LcdTinyString(enterNumberUnits, TEXT_INVERSE);	
+			strcpy_P(str, enterNumberUnits);
+			LcdTinyString(str, TEXT_INVERSE);	
 			LcdTinyString(" ", TEXT_INVERSE);	
 		}								
 	}	
@@ -2096,7 +2179,7 @@ void DrawModeScreen()
 			LcdTinyString(choicePrompt, TEXT_NORMAL);
 		}
 			
-		LcdGoto((7 - strlen(choice1))*4, *choicePrompt ? 4 : 3);
+		LcdGoto((8 - strlen(choice1))*4, *choicePrompt ? 4 : 3);
 		strcpy_P(str, PSTR(" "));
 		strcat(str, choice1);
 		strcat_P(str, PSTR(" "));
@@ -2122,16 +2205,15 @@ void DrawModeScreen()
 			LcdGoto(0,2);
 			LcdTinyString(str, TEXT_NORMAL);
 							
-			if (altitudeDestination != 0x7FFF)
+			if (altitudeDestination != INVALID_SAMPLE)
 			{
 				LcdGoto(0,4);
 				strcpy_P(str, PSTR("Destination "));
-				itoa(altitudeDestination, &str[strlen(str)], 10);
-				strcat_P(str, PSTR(" ft "));
+				MakeSampleValueAndUnitsString(&str[strlen(str)], GRAPH_ALTITUDE, altitudeDestination);
 				LcdTinyString(str, TEXT_NORMAL);	
 			}
 				
-			if (altitudeDestination != 0x7FFF)
+			if (altitudeDestination != INVALID_SAMPLE)
 			{		
 				MakeDataString(str, MENU_DATA_TIME_TO_DESTINATION);		
 				LcdGoto(0,5);	
@@ -2155,8 +2237,8 @@ void DrawModeScreen()
 			
 			LcdGoto(0,2);
 			LcdTinyString("Trend ", TEXT_NORMAL);
-			long tempTrend = GetTemperatureTrend();
-			if (tempTrend == 0x7FFFFFFF)
+			long tempTrend = GetTemperatureTrend(); // in units of half degrees F
+			if (tempTrend == INVALID_RATE)
 			{
 				strcpy_P(str, PSTR("---"));
 			}
@@ -2171,13 +2253,14 @@ void DrawModeScreen()
 				{
 					*str = 0;
 				}
-				dtostrf((double)tempTrend/10, 1, 1, &str[strlen(str)]);
+				
+				MakeTemperatureDifferenceString(&str[strlen(str)], tempTrend);
 			}
 			LcdTinyString(str, TEXT_NORMAL);
 			LcdTinyString(" deg/h", TEXT_NORMAL);
 			
 			LcdGoto(0,3);
-			for (int j=0; j<LCD_WIDTH; j++)
+			for (uint8_t j=0; j<LCD_WIDTH; j++)
 			{
 				LcdWrite(LCD_DATA, 0x00);				
 			}
@@ -2202,16 +2285,12 @@ void DrawModeScreen()
 			
 			LcdGoto(0,2);
 			long pressureTrend1 = GetPressureTrend1(); // units are mb * 100
-			if (pressureTrend1 == 0x7FFFFFFF)
+			if (pressureTrend1 == INVALID_RATE)
 			{
 				strcpy_P(str, PSTR("----"));
 			}
 			else
-			{
-				pressureTrend1 *= 2953;
-				pressureTrend1 /= 100000;
-				//sprintf(str, "%+ld.%02ld", pressureTrend1/100, labs(pressureTrend1)%100);
-				
+			{			
 				if (pressureTrend1 >= 0)
 				{
 					strcpy_P(str, PSTR("+"));
@@ -2220,13 +2299,14 @@ void DrawModeScreen()
 				{
 					*str = 0;
 				}			
-				dtostrf((double)pressureTrend1/100, 1, 2, &str[strlen(str)]);
+				
+				MakePressureString(&str[strlen(str)], (pressureTrend1 + 25) / 50);
 			}
 			LcdTinyString(str, TEXT_NORMAL);
 			LcdTinyString(" in past 1h", TEXT_NORMAL);
 
 			LcdGoto(0,3);
-			for (int i=0; i<LCD_WIDTH; i++)
+			for (uint8_t i=0; i<LCD_WIDTH; i++)
 			{
 				LcdWrite(LCD_DATA, 0x00);
 			}
@@ -2237,35 +2317,9 @@ void DrawModeScreen()
 			LcdGoto(0,4);
 			MakeDataString(str, MENU_DATA_PRESSURE_SEALEVEL);
 			LcdTinyString(str, TEXT_NORMAL);
-			
-			/*LcdGoto(0,3);
-			long pressureTrend5 = GetPressureTrend5();
-			if (pressureTrend5 == 0x7FFFFFFF)
-			{
-				strcpy_P(str, PSTR("----"));
-			}
-			else
-			{
-				pressureTrend5 *= 2953;
-				pressureTrend5 /= 100000;
-				//sprintf(str, "%+ld.%02ld", pressureTrend5/100, labs(pressureTrend5)%100);
-				
-				if (pressureTrend5 >= 0)
-				{
-					strcpy_P(str, PSTR("+"));
-				}
-				else
-				{
-					*str = 0;
-				}			
-				dtostrf((double)pressureTrend5/100, 1, 2, &str[strlen(str)]);
-			}
-			LcdTinyString(str, TEXT_NORMAL);
-			LcdTinyString(" in/h past 5h", TEXT_NORMAL);
-			*/
 							
 			LcdGoto(0,5);
-			for (int i=0; i<LCD_WIDTH; i++)
+			for (uint8_t i=0; i<LCD_WIDTH; i++)
 			{
 				LcdWrite(LCD_DATA, 0x00);
 			}

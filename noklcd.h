@@ -42,7 +42,7 @@ extern volatile uint8_t graphDrawPoints[GRAPH_COUNT];
 void LcdReset(void);
 void LcdClear(void);
 void LcdPowerSave(uint8_t powerSaveOn);
-void LcdGoto(int x, int y);
+void LcdGoto(uint8_t x, uint8_t y);
 void LcdWrite(uint8_t dc, uint8_t data);
 void LcdCharacter(char character);
 void LcdString(char *characters);

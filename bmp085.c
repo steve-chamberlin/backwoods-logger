@@ -250,10 +250,12 @@ long bmp085ConvertPressure(unsigned long up)
 
 float bmp085GetAltitude(float pressure)
 {
+	// return the altitude in meters that corresponds to the given pressure in hundredths of a millibar
 	return (float)44330 * (1 - pow(((float) pressure/expectedSeaLevelPressure), 0.190295));
 }
 
 float bmp085GetSeaLevelPressure(float stationPressure, float trueAltitude)
 {
+	// return the pressure in hundredths of a millibar that corresponds to the station pressure in hundredths of a millibar and true altitude in meters
 	return stationPressure / pow((1-trueAltitude/44330), 5.255);
 }

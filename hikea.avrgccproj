@@ -89,44 +89,13 @@
   <PropertyGroup Condition=" '$(Configuration)' == 'Mini - Release' ">
     <ToolchainSettings>
       <AvrGcc>
-  <avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>
-  <avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>
-  <avrgcc.compiler.symbols.DefSymbols>
-    <ListValues>
-      <Value>LOGGER_MINI</Value>
-      <Value>SSD1306_LCD</Value>
-      <Value>F_CPU=8000000</Value>
-    </ListValues>
-  </avrgcc.compiler.symbols.DefSymbols>
-  <avrgcc.compiler.optimization.level>Optimize for size (-Os)</avrgcc.compiler.optimization.level>
-  <avrgcc.compiler.optimization.PackStructureMembers>True</avrgcc.compiler.optimization.PackStructureMembers>
-  <avrgcc.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcc.compiler.optimization.AllocateBytesNeededForEnum>
-  <avrgcc.compiler.optimization.DebugLevel>Default (-g2)</avrgcc.compiler.optimization.DebugLevel>
-  <avrgcc.compiler.warnings.AllWarnings>True</avrgcc.compiler.warnings.AllWarnings>
-  <avrgcc.linker.libraries.Libraries>
-    <ListValues>
-      <Value>libm.a</Value>
-    </ListValues>
-  </avrgcc.linker.libraries.Libraries>
-</AvrGcc>
-    </ToolchainSettings>
-    <MemorySettings />
-    <GenerateHexFile>True</GenerateHexFile>
-    <GenerateMapFile>True</GenerateMapFile>
-    <GenerateListFile>True</GenerateListFile>
-    <GenerateEepFile>True</GenerateEepFile>
-    <OutputPath>bin\Mini - Release\</OutputPath>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)' == 'Classic - Release' ">
-    <ToolchainSettings>
-      <AvrGcc>
         <avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>
         <avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>
         <avrgcc.compiler.symbols.DefSymbols>
           <ListValues>
-            <Value>F_CPU=1000000</Value>
-            <Value>NOKIA_LCD</Value>
-            <Value>LOGGER_CLASSIC</Value>
+            <Value>LOGGER_MINI</Value>
+            <Value>SSD1306_LCD</Value>
+            <Value>F_CPU=8000000</Value>
           </ListValues>
         </avrgcc.compiler.symbols.DefSymbols>
         <avrgcc.compiler.optimization.level>Optimize for size (-Os)</avrgcc.compiler.optimization.level>
@@ -146,6 +115,37 @@
     <GenerateMapFile>True</GenerateMapFile>
     <GenerateListFile>True</GenerateListFile>
     <GenerateEepFile>True</GenerateEepFile>
+    <OutputPath>bin\Mini - Release\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Classic - Release' ">
+    <ToolchainSettings>
+      <AvrGcc>
+  <avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>
+  <avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>
+  <avrgcc.compiler.symbols.DefSymbols>
+    <ListValues>
+      <Value>F_CPU=1000000</Value>
+      <Value>NOKIA_LCD</Value>
+      <Value>LOGGER_CLASSIC</Value>
+    </ListValues>
+  </avrgcc.compiler.symbols.DefSymbols>
+  <avrgcc.compiler.optimization.level>Optimize for size (-Os)</avrgcc.compiler.optimization.level>
+  <avrgcc.compiler.optimization.PackStructureMembers>True</avrgcc.compiler.optimization.PackStructureMembers>
+  <avrgcc.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcc.compiler.optimization.AllocateBytesNeededForEnum>
+  <avrgcc.compiler.optimization.DebugLevel>Default (-g2)</avrgcc.compiler.optimization.DebugLevel>
+  <avrgcc.compiler.warnings.AllWarnings>True</avrgcc.compiler.warnings.AllWarnings>
+  <avrgcc.linker.libraries.Libraries>
+    <ListValues>
+      <Value>libm.a</Value>
+    </ListValues>
+  </avrgcc.linker.libraries.Libraries>
+</AvrGcc>
+    </ToolchainSettings>
+    <MemorySettings />
+    <GenerateHexFile>True</GenerateHexFile>
+    <GenerateMapFile>True</GenerateMapFile>
+    <GenerateListFile>True</GenerateListFile>
+    <GenerateEepFile>True</GenerateEepFile>
     <OutputPath>bin\Classic - Release\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
@@ -158,19 +158,10 @@
     <Compile Include="bmp085.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="calib_32kHz.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="calib_values.h">
-      <SubType>compile</SubType>
-    </Compile>
     <Compile Include="clock.c">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="clock.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="device_specific.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="glcdfont.c">
