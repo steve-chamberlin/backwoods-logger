@@ -17,6 +17,7 @@
 #define SAMPLING_H_
 
 #include <inttypes.h>
+#include <avr/pgmspace.h>
 
 // temperature, in units of Farenheit * 10
 // can store -10 to 117.5F, in 0.5F steps
@@ -49,6 +50,9 @@
 #define NUM_SRAM_TIME_SCALES 2
 #endif
 
+#define INVALID_SAMPLE_MIN 0x7FFE
+#define INVALID_SAMPLE 0x7FFF
+#define INVALID_RAW_VALUE 0xFFFF
 
 enum {
 	GRAPH_TEMPERATURE = 0,
@@ -62,7 +66,11 @@ extern long last_pressure;
 extern float last_altitude;
 extern uint16_t minutesPerSample[];
 extern volatile short last_calibration_altitude;
-
+extern volatile uint8_t useImperialUnits;
+extern const char* unitStrings[];
+extern int16_t minDataValues[];
+extern int16_t maxDataValues[];
+	
 typedef struct 
 {
 	unsigned int temperature:TEMPERATURE_BITS;
@@ -80,9 +88,14 @@ void SamplingInit(uint8_t forceEEpromClear);
 void StoreSample(short temperatureRaw, long pressureRaw);
 uint8_t GetTimescaleNextSampleIndex(uint8_t timescaleNumber);
 Sample* GetSample(uint8_t timescaleNumber, uint8_t index);
-char* MakeSampleValueString(char* str, uint8_t type, int16_t sampleValue);
-char* MakeSampleUnitsString(char* str, uint8_t type, int16_t sampleValue);
-
+void MakePressureString(char* str, int16_t val);
+void MakeTemperatureString(char* str, int16_t val);	
+void MakeTemperatureDifferenceString(char* str, int16_t val);
+void MakeAltitudeString(char* str, int16_t val);	
+void MakeSampleValueString(char* str, uint8_t type, int16_t sampleValue);
+void AppendSampleUnitsString(char* str, uint8_t type);
+void MakeSampleValueAndUnitsString(char* str, uint8_t type, int16_t sampleValue);
+void MakeSampleValueAndUnitsStringForGraph(char* str, uint8_t type, int16_t sampleValue);
 void StoreSnapshot(short temperatureRaw, long pressureRaw, uint32_t packedYearMonthDayHourMin);
 uint8_t GetNewestSnapshotIndex();
 Snapshot* GetSnapshot(uint8_t index);

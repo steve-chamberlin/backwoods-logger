@@ -285,10 +285,10 @@ void ssd1306_goto(uint8_t x, uint8_t y)
 
 void LcdReset(void)
 {
-	for (int i=0; i<GRAPH_COUNT; i++)
+	for (uint8_t i=0; i<GRAPH_COUNT; i++)
 	{
-		graphYMin[i] = 0x7FFF;
-		graphYMax[i] = 0x7FFF;
+		graphYMin[i] = INVALID_SAMPLE;
+		graphYMax[i] = INVALID_SAMPLE;
 		graphDrawPoints[i] = 0;
 	}
 	
@@ -320,7 +320,7 @@ void LcdSetBacklight(uint8_t on)
 }
 
 #if 0
-void LcdGoto(int x, int y)
+void LcdGoto(uint8_t x, uint8_t y)
 {
 	ssd1306_goto(x, y);	
 }
@@ -405,9 +405,9 @@ void LcdDrawGraph2(uint8_t timescaleNumber, uint8_t type, uint8_t cursorPos, uin
 	
 	// find the min and max values
 	uint16_t rawValue;
-	uint16_t minRawValue = 0xFFFF;
+	uint16_t minRawValue = INVALID_RAW_VALUE;
 	uint16_t maxRawValue = 0;
-	uint16_t rawCursorValue = 0xFFFF;
+	uint16_t rawCursorValue = INVALID_RAW_VALUE;
 	short cursorValue;
 	short minValue;
 	short maxValue;
@@ -449,44 +449,44 @@ void LcdDrawGraph2(uint8_t timescaleNumber, uint8_t type, uint8_t cursorPos, uin
 	if (type == GRAPH_TEMPERATURE)
 	{
 		cursorValue = SAMPLE_TO_TEMPERATURE(rawCursorValue);
-		minValue = graphYMin[GRAPH_TEMPERATURE] == 0x7FFF ? SAMPLE_TO_TEMPERATURE(minRawValue) : graphYMin[GRAPH_TEMPERATURE]*2;
-		maxValue = graphYMax[GRAPH_TEMPERATURE] == 0x7FFF ? SAMPLE_TO_TEMPERATURE(maxRawValue) : graphYMax[GRAPH_TEMPERATURE]*2;
+		minValue = graphYMin[GRAPH_TEMPERATURE] == INVALID_SAMPLE ? SAMPLE_TO_TEMPERATURE(minRawValue) : graphYMin[GRAPH_TEMPERATURE];
+		maxValue = graphYMax[GRAPH_TEMPERATURE] == INVALID_SAMPLE ? SAMPLE_TO_TEMPERATURE(maxRawValue) : graphYMax[GRAPH_TEMPERATURE];
 		graphCurrentYMin = minValue / 2;
 		graphCurrentYMax = maxValue / 2;
-		customAxes = graphYMin[GRAPH_TEMPERATURE] != 0x7FFF || graphYMax[GRAPH_TEMPERATURE] != 0x7FFF;
+		customAxes = graphYMin[GRAPH_TEMPERATURE] != INVALID_SAMPLE || graphYMax[GRAPH_TEMPERATURE] != INVALID_SAMPLE;
 	}
 	else if (type == GRAPH_PRESSURE)
 	{
 		cursorValue = SAMPLE_TO_PRESSURE(rawCursorValue);
-		minValue = graphYMin[GRAPH_PRESSURE] == 0x7FFF ? SAMPLE_TO_PRESSURE(minRawValue) : graphYMin[GRAPH_PRESSURE]*2*33.86389f;  
-		maxValue = graphYMax[GRAPH_PRESSURE] == 0x7FFF ? SAMPLE_TO_PRESSURE(maxRawValue) : graphYMax[GRAPH_PRESSURE]*2*33.86389f;
+		minValue = graphYMin[GRAPH_PRESSURE] == INVALID_SAMPLE ? SAMPLE_TO_PRESSURE(minRawValue) : graphYMin[GRAPH_PRESSURE];  
+		maxValue = graphYMax[GRAPH_PRESSURE] == INVALID_SAMPLE ? SAMPLE_TO_PRESSURE(maxRawValue) : graphYMax[GRAPH_PRESSURE];
 		graphCurrentYMin = minValue / (2*33.86389f);
 		graphCurrentYMax = maxValue / (2*33.86389f);
-		customAxes = graphYMin[GRAPH_PRESSURE] != 0x7FFF || graphYMax[GRAPH_PRESSURE] != 0x7FFF;
+		customAxes = graphYMin[GRAPH_PRESSURE] != INVALID_SAMPLE || graphYMax[GRAPH_PRESSURE] != INVALID_SAMPLE;
 	}
 	else
 	{
 		cursorValue = SAMPLE_TO_ALTITUDE(rawCursorValue);
-		minValue = graphYMin[GRAPH_ALTITUDE] == 0x7FFF ? SAMPLE_TO_ALTITUDE(minRawValue) : graphYMin[GRAPH_ALTITUDE]/2;
-		maxValue = graphYMax[GRAPH_ALTITUDE] == 0x7FFF ? SAMPLE_TO_ALTITUDE(maxRawValue) : graphYMax[GRAPH_ALTITUDE]/2;
+		minValue = graphYMin[GRAPH_ALTITUDE] == INVALID_SAMPLE ? SAMPLE_TO_ALTITUDE(minRawValue) : graphYMin[GRAPH_ALTITUDE]/2;
+		maxValue = graphYMax[GRAPH_ALTITUDE] == INVALID_SAMPLE ? SAMPLE_TO_ALTITUDE(maxRawValue) : graphYMax[GRAPH_ALTITUDE]/2;
 		graphCurrentYMin = minValue * 2;
 		graphCurrentYMax = maxValue * 2;
-		customAxes = graphYMin[GRAPH_ALTITUDE] != 0x7FFF || graphYMax[GRAPH_ALTITUDE] != 0x7FFF;
+		customAxes = graphYMin[GRAPH_ALTITUDE] != INVALID_SAMPLE || graphYMax[GRAPH_ALTITUDE] != INVALID_SAMPLE;
 	}
 	
-	if (rawCursorValue == 0xFFFF)
+	if (rawCursorValue == INVALID_RAW_VALUE)
 	{
-		cursorValue = 0x7FFF;
+		cursorValue = INVALID_SAMPLE;
 	}
 
 	const int graphLastPixel = 55; // graphHeight - 1
 	const int minGraphSampleRange = (graphLastPixel+1)/2; // don't allow very small vertical ranges, to prevent super-jaggies
 		
-	if (minRawValue == 0xFFFF)
+	if (minRawValue == INVALID_RAW_VALUE)
 	{
 		// no filled samples
-		minValue = 0x7FFE;
-		maxValue = 0x7FFF;
+		minValue = INVALID_SAMPLE_MIN;
+		maxValue = INVALID_SAMPLE;
 		graphCurrentYMin = graphCurrentYMax = 0;
 	}	
 	else if (maxValue == minValue)
@@ -526,7 +526,7 @@ void LcdDrawGraph2(uint8_t timescaleNumber, uint8_t type, uint8_t cursorPos, uin
 		uint8_t ormask[7];
 		uint8_t andmask[7];
 		
-		for (int y=0; y<7; y++)
+		for (uint8_t y=0; y<7; y++)
 		{
 			ormask[y] = (showCursor && (x == cursorPos)) ? 0x55 : 0;	
 			andmask[y] = 0xFF;
@@ -564,7 +564,7 @@ void LcdDrawGraph2(uint8_t timescaleNumber, uint8_t type, uint8_t cursorPos, uin
 				
 		uint8_t pixeldata[7];
 		
-		for (int y=0; y<7; y++)
+		for (uint8_t y=0; y<7; y++)
 		{
 			pixeldata[y] = 0;
 		}			
@@ -651,7 +651,7 @@ void LcdDrawGraph2(uint8_t timescaleNumber, uint8_t type, uint8_t cursorPos, uin
 			prevysample = ysample;
 		}	
 		
-		for (int y=0; y<7; y++)
+		for (uint8_t y=0; y<7; y++)
 		{
 			LcdWrite(LCD_DATA, (pixeldata[y] & andmask[y]) | ormask[y]);				
 		}		
@@ -677,10 +677,13 @@ void LcdDrawGraph2(uint8_t timescaleNumber, uint8_t type, uint8_t cursorPos, uin
 			LcdWrite(LCD_DATA, 0x7F);
 		}
 		
-		char valueStr[8];
-		char unitsStr[3];
-		strcpy(str, MakeSampleValueString(valueStr, type, cursorValue));
-		strcat(str, MakeSampleUnitsString(unitsStr, type, cursorValue));
+		// convert altitude into the units expected by the formatting functions
+		// TODO: harmonize all the units-related functions so this isn't necessary
+		if (type == GRAPH_ALTITUDE)
+		{
+			cursorValue *= 2;
+		}		
+		MakeSampleValueAndUnitsStringForGraph(str, type, cursorValue);
 		LcdDrawGraphRightLegend(str);
 	}
 	else
@@ -707,7 +710,15 @@ void LcdDrawGraph2(uint8_t timescaleNumber, uint8_t type, uint8_t cursorPos, uin
 
 void LcdMakeGraphYAxis(uint8_t type, int yminlabel, int ymaxlabel, uint8_t* yMinBuffer, uint8_t* yMaxBuffer, uint8_t* yMinSize, uint8_t* yMaxSize)
 {
-// clear frame buffers
+	// convert altitude into the units expected by the formatting functions
+	// TODO: harmonize all the units-related functions so this isn't necessary
+	if (type == GRAPH_ALTITUDE)
+	{
+		yminlabel *= 2;
+		ymaxlabel *= 2;
+	}
+		
+	// clear frame buffers
 	for (uint8_t i=0; i<4*5; i++)
 	{
 		yMinBuffer[i] = 0;
@@ -726,7 +737,7 @@ void LcdMakeGraphYAxis(uint8_t type, int yminlabel, int ymaxlabel, uint8_t* yMin
 	{
 		unsigned short charbase = (*characters++ - 0x20) * 5;
 		
-		for (int index = 0; index < 5; index++)
+		for (uint8_t index = 0; index < 5; index++)
 		{
 			uint8_t pixels = pgm_read_byte((unsigned char*)font + charbase + index);
 			//LcdWrite(LCD_DATA, pixels);
@@ -747,7 +758,7 @@ void LcdMakeGraphYAxis(uint8_t type, int yminlabel, int ymaxlabel, uint8_t* yMin
 	{
 		unsigned short charbase = (*characters++ - 0x20) * 5;
 		
-		for (int index = 0; index < 5; index++)
+		for (uint8_t index = 0; index < 5; index++)
 		{
 			uint8_t pixels = pgm_read_byte((unsigned char*)font + charbase + index);
 			pixels = pixels << 1;

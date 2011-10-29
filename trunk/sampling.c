@@ -45,10 +45,11 @@
 #define EEPROM_SNAPSHOTS_BASE (EEPROM_SAMPLES_BASE+(NUM_TIME_SCALES-NUM_SRAM_TIME_SCALES)*(SAMPLES_PER_GRAPH*sizeof(Sample)))
 #define EEPROM_SNAPSHOTS_MAX ((1024-EEPROM_SNAPSHOTS_BASE)/sizeof(Snapshot))
 
-short last_temperature;
-long last_pressure;
-float last_altitude;
+short last_temperature; // units of 2 * degrees F (halves of a degree)
+long last_pressure; // units of 100 * millibars (hundredths of a millibar)
+float last_altitude; // units of feet
 volatile short last_calibration_altitude;
+volatile uint8_t useImperialUnits = 3;
 
 Sample sampleData[NUM_SRAM_TIME_SCALES][SAMPLES_PER_GRAPH]; 
 uint8_t nextSampleIndex[NUM_SRAM_TIME_SCALES]; 
@@ -61,6 +62,35 @@ uint16_t minutesPerSample[NUM_TIME_SCALES] = {1, 6, 30}; // must evenly divide 1
 // mini: 2h, 10h, 2.5d
 uint16_t minutesPerSample[NUM_TIME_SCALES] = {1, 5, 30}; // must evenly divide 1440 for correct sample time detection
 #endif
+
+const char tempMetric[] PROGMEM = "`C";
+const char pressureMetric[] PROGMEM = " mb";
+const char altitudeMetric[] PROGMEM = " m";
+const char tempEnglish[] PROGMEM = "`F";
+const char pressureEnglish[] PROGMEM = " in";
+const char altitudeEnglish[] PROGMEM = " ft";
+
+const char* unitStrings[] = { 
+	tempMetric, pressureMetric, altitudeMetric, tempEnglish, pressureEnglish, altitudeEnglish
+};
+
+int16_t minDataValues[] = {
+	-23,  // tempMetric
+	170,  // pressureMetric
+	-305, // altitudeMetric
+	-10,  // tempEnglish
+	5,    // pressureEnglish
+	-1000 // altitude English
+};
+
+int16_t maxDataValues[] = {
+	48,   // tempMetric
+	1253, // pressureMetric
+	4572, // altitudeMetric
+	118,  // tempEnglish
+	37,   // pressureEnglish
+	15000 // altitude English
+};
 
 uint32_t* GetSampleEEpromAddress(uint8_t timescaleNumber, uint8_t index)
 {
@@ -95,11 +125,11 @@ Sample* GetSample(uint8_t timescaleNumber, uint8_t index)
 
 void FillSample(Sample* pSample, short temperatureRaw, long pressureRaw)
 {
-	last_temperature = temperatureRaw;
 	last_pressure = pressureRaw;
 	
 	// temperature (F)
 	long tempFSample = (temperatureRaw * 9) / 5 + 320; // convert to F tenths
+	last_temperature = tempFSample / 5;
 	if (tempFSample < TEMPERATURE_MIN)
 	{
 		tempFSample = TEMPERATURE_MIN;			 // cap at min value
@@ -125,7 +155,7 @@ void FillSample(Sample* pSample, short temperatureRaw, long pressureRaw)
 	}
 	
 	// altitude (FT) 
-	last_altitude = (3.2808399f * bmp085GetAltitude((float)pressureRaw)); 
+	last_altitude = 3.28f * bmp085GetAltitude((float)pressureRaw); 
 	long altitudeSample = (long) (last_altitude + 0.5f);	
 	if (altitudeSample < ALTITUDE_MIN)
 	{
@@ -191,9 +221,9 @@ void StoreSnapshot(short temperatureRaw, long pressureRaw, uint32_t packedYearMo
 	FillSample(&newSample, temperatureRaw, pressureRaw);
 	
 	// find the oldest snapshot
-	int oldestIndex = 0;
+	uint8_t oldestIndex = 0;
 	uint32_t oldestTime = 0xFFFFFFFF;
-	for (int i=0; i<EEPROM_SNAPSHOTS_MAX; i++)
+	for (uint8_t i=0; i<EEPROM_SNAPSHOTS_MAX; i++)
 	{
 		uint32_t* eepromAddress = (uint32_t*)(EEPROM_SNAPSHOTS_BASE + i*sizeof(Snapshot));
 		uint32_t time = eeprom_read_dword(eepromAddress);
@@ -214,9 +244,9 @@ void StoreSnapshot(short temperatureRaw, long pressureRaw, uint32_t packedYearMo
 uint8_t GetNewestSnapshotIndex()
 {
 	// find the newest snapshot
-	int newestIndex = 0;
+	uint8_t newestIndex = 0;
 	uint32_t newestTime = 0;
-	for (int i=0; i<EEPROM_SNAPSHOTS_MAX; i++)
+	for (uint8_t i=0; i<EEPROM_SNAPSHOTS_MAX; i++)
 	{
 		uint32_t* eepromAddress = (uint32_t*)(EEPROM_SNAPSHOTS_BASE + i*sizeof(Snapshot));
 		uint32_t time = eeprom_read_dword(eepromAddress);
@@ -255,7 +285,7 @@ uint8_t GetNumSnapshots()
 {
 	uint8_t count = 0;
 	
-	for (int i=0; i<EEPROM_SNAPSHOTS_MAX; i++)
+	for (uint8_t i=0; i<EEPROM_SNAPSHOTS_MAX; i++)
 	{
 		uint32_t* eepromAddress = (uint32_t*)(EEPROM_SNAPSHOTS_BASE + i*sizeof(Snapshot));
 		uint32_t time = eeprom_read_dword(eepromAddress);
@@ -303,7 +333,7 @@ void SamplingInit(uint8_t forceEEpromClear)
 		eeprom_update_dword((uint32_t*)EEPROM_HEADER_BASE + 1, 0);
 		
 		// clear all the samples
-		for (int scale=NUM_SRAM_TIME_SCALES; scale < NUM_TIME_SCALES; scale++)
+		for (uint8_t scale=NUM_SRAM_TIME_SCALES; scale < NUM_TIME_SCALES; scale++)
 		{
 			for (uint8_t i=0; i<SAMPLES_PER_GRAPH; i++)
 			{
@@ -312,7 +342,7 @@ void SamplingInit(uint8_t forceEEpromClear)
 		}
 		
 		// clear all the snapshots
-		for (int i=0; i<EEPROM_SNAPSHOTS_MAX; i++)
+		for (uint8_t i=0; i<EEPROM_SNAPSHOTS_MAX; i++)
 		{
 			uint32_t* eepromAddress = (uint32_t*)(EEPROM_SNAPSHOTS_BASE + i*sizeof(Snapshot));
 			eeprom_update_dword(eepromAddress, 0);
@@ -321,53 +351,105 @@ void SamplingInit(uint8_t forceEEpromClear)
 	}		
 }
 
-char* MakeSampleValueString(char* str, uint8_t type, int16_t sampleValue)
+void MakeTemperatureString(char* str, int16_t val)
 {
-	if (sampleValue >= 0x7FFE)
+	// val is temperature in units of 2 * degrees F
+	double fVal = val;
+	if (!useImperialUnits)
 	{
-		*str = 0;
-		return str;
+		fVal = ((fVal - 64) * 5) / 9;
 	}
+	dtostrf(fVal/2, 1, 1, str);	
+}
 	
-	if (type == GRAPH_TEMPERATURE)
+void MakeTemperatureDifferenceString(char* str, int16_t val)
+{
+	// val is temperature difference in units of 2 * degrees F (half degree per unit)
+	double fVal = val;
+	if (!useImperialUnits)
 	{
-		dtostrf((double)sampleValue/2,1,1,str);
+		fVal = (fVal * 5) / 9;
 	}
-	else if (type == GRAPH_PRESSURE)
-	{
-		// 1 hpa = 0.0295301 in hg
-		int32_t longValue = 2953L * sampleValue; // 100000 * 0.0295301
-		sampleValue = longValue / 2000;
-		dtostrf((double)sampleValue/100,1,2,str);
-	}
-	else
-	{
-		itoa(sampleValue*2, str, 10);
-	}
+	dtostrf(fVal/2, 1, 1, str);	
+}
 	
-	return str;
+void MakePressureString(char* str, int16_t val)
+{
+	// val is pressure in units of 2 * millibars (half mb per unit)
+	if (useImperialUnits)
+	{
+		int32_t longValue;		
+		longValue = 2953L * val; // 100000 * 0.0295301
+		val = longValue / 100000;
+	}			
+	dtostrf((double)val/2, 1, useImperialUnits?2:0, str);	
+}	
+
+void MakeAltitudeString(char* str, int16_t val)		
+{
+	// val is altitude in units of feet
+	if (!useImperialUnits)
+	{
+		val = ((long)val * 100) / 328;
+	}
+	itoa(val, str, 10);	
 }
 
-char* MakeSampleUnitsString(char* str, uint8_t type, int16_t sampleValue)
+void MakeSampleValueString(char* str, uint8_t type, int16_t sampleValue)
 {
-	if (sampleValue >= 0x7FFE)
-	{
-		*str = 0;
-		return str;
-	}
-	
 	if (type == GRAPH_TEMPERATURE)
 	{
-		strcpy_P(str, PSTR("'F"));
+		MakeTemperatureString(str, sampleValue);
 	}
 	else if (type == GRAPH_PRESSURE)
 	{
-		strcpy_P(str, PSTR("in"));
+		MakePressureString(str, sampleValue);
+	}
+	else // altitude
+	{
+		MakeAltitudeString(str, sampleValue);
+	}
+}
+
+void AppendSampleUnitsString(char* str, uint8_t type)
+{	
+	if (type == GRAPH_TEMPERATURE)
+	{
+		strcat_P(str, unitStrings[useImperialUnits + GRAPH_TEMPERATURE]);
+	}
+	else if (type == GRAPH_PRESSURE)
+	{
+		strcat_P(str, &unitStrings[useImperialUnits + GRAPH_PRESSURE][1]);
 	}
 	else
 	{
-		strcpy_P(str, PSTR("ft"));
+		strcat_P(str, &unitStrings[useImperialUnits + GRAPH_ALTITUDE][1]);
+	}
+}
+
+void MakeSampleValueAndUnitsString(char* str, uint8_t type, int16_t sampleValue)
+{
+	// concatenates the value and the unit string, with a space between them
+	if (sampleValue >= INVALID_SAMPLE_MIN)
+	{
+		*str = 0;
+		return;
 	}
 	
-	return str;
+	MakeSampleValueString(str, type, sampleValue);
+	strcat_P(str, PSTR(" "));
+	AppendSampleUnitsString(str, type);
+}
+
+void MakeSampleValueAndUnitsStringForGraph(char* str, uint8_t type, int16_t sampleValue)
+{
+	// concatenates the value and the unit string, with no space between them
+	if (sampleValue >= INVALID_SAMPLE_MIN)
+	{
+		*str = 0;
+		return;
+	}
+	
+	MakeSampleValueString(str, type, sampleValue);
+	AppendSampleUnitsString(str, type);
 }

@@ -33,7 +33,7 @@ char* MakeShortTimeString(char* str, uint8_t hour, uint8_t minute);
 char* MakeTimeString(char* str, uint8_t hour, uint8_t minute, uint8_t second);
 char* MakeApproxTimeString(char* str, uint16_t minutes);
 char* MakePastTimeString(char* str, uint16_t timeAgo);
-int StrToMonth(PGM_P str);
+uint8_t StrToMonth(PGM_P str);
 void ClockInit();
 void ClockTick();
 

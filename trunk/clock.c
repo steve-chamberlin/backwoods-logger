@@ -47,12 +47,12 @@ const char* monthNames[] PROGMEM = {
 	month1, month2, month3, month4, month5, month6, month7, month8, month9, month10, month11, month12 
 };
 
-int StrToMonth(PGM_P str)
+uint8_t StrToMonth(PGM_P str)
 {
-	for (int i=0; i<12; i++)
+	for (uint8_t i=0; i<12; i++)
 	{
 		PGM_P pMonthName = (PGM_P)pgm_read_word(&monthNames[i]);
-		int j;
+		uint8_t j;
 		for (j=0; j<3; j++)
 		{
 			uint8_t c1 = pgm_read_byte(&str[j]);
