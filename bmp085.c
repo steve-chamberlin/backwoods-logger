@@ -33,17 +33,18 @@
 volatile float expectedSeaLevelPressure;
 
 // Calibration values
-int ac1;
-int ac2; 
-int ac3; 
-unsigned int ac4;
-unsigned int ac5;
-unsigned int ac6;
-int b1; 
-int b2;
-int mb;
-int mc;
-int md;
+uint16_t calibrationData[11];
+#define ac1 ((int16_t)calibrationData[0])
+#define ac2 ((int16_t)calibrationData[1])
+#define ac3 ((int16_t)calibrationData[2])
+#define ac4 calibrationData[3]
+#define ac5 calibrationData[4]
+#define ac6 calibrationData[5]
+#define b1 ((int16_t)calibrationData[6]) 
+#define b2 ((int16_t)calibrationData[7])
+#define mb ((int16_t)calibrationData[8])
+#define mc ((int16_t)calibrationData[9])
+#define md ((int16_t)calibrationData[10])
 
 // b5 is calculated in bmp085GetTemperature(...), this variable is also used in bmp085GetPressure(...)
 // so ...Temperature(...) must be called before ...Pressure(...).
@@ -52,18 +53,6 @@ long b5;
 void bmp085Reset()
 {
 	expectedSeaLevelPressure = 101325.0f;
-}
-
-uint8_t i2cResult = 0;
-
-// Read 2 bytes from the BMP085
-// First byte will be from 'address'
-// Second byte will be from 'address'+1
-int bmp085ReadInt(unsigned char address)
-{
-  uint8_t result[2];
-  i2cResult = i2cReadBytes(address, 2, result);
-  return (int16_t)(((uint16_t) result[0] << 8) | result[1]);
 }
 
 // Stores all of the bmp085's calibration values into global variables
@@ -85,19 +74,23 @@ uint8_t bmp085Init()
   i2cInit();
   i2cSetAddress(BMP085_ADDRESS);
 		
-  ac1 = bmp085ReadInt(0xAA);
-  ac2 = bmp085ReadInt(0xAC);
-  ac3 = bmp085ReadInt(0xAE);
-  ac4 = bmp085ReadInt(0xB0);
-  ac5 = bmp085ReadInt(0xB2);
-  ac6 = bmp085ReadInt(0xB4);
-  b1 = bmp085ReadInt(0xB6);
-  b2 = bmp085ReadInt(0xB8);
-  mb = bmp085ReadInt(0xBA);
-  mc = bmp085ReadInt(0xBC);
-  md = bmp085ReadInt(0xBE);	
-			 
-  return i2cResult;
+  // read 11 2-byte calibration values beginning at address 0xAA		
+  if (i2cReadBytes(0xAA, 22, (uint8_t*)calibrationData))
+  {
+	  // byte swap the values
+	  uint8_t count = 0;
+	  for (uint8_t* pWord=(uint8_t*)calibrationData; count<11; pWord+=2, count++)
+	  {
+		  uint8_t temp = *pWord;
+		  *pWord = *(pWord+1);
+		  *(pWord+1) = temp;
+	  }			 
+	  return 1;
+  }
+  else
+  {
+	  return 0;
+  }  
 }
 
 // Read the uncompensated temperature value
@@ -113,23 +106,22 @@ unsigned int bmp085ReadUT()
   _delay_ms(5);
   
   // Read two bytes from registers 0xF6 and 0xF7
-  ut = bmp085ReadInt(0xF6);
-  
-  // Return 0 if i2c was unsuccessful, else return the value read
-  if (i2cResult == 0)
+  // Return the value read if i2c was successful, else return 0
+  uint8_t result[2];
+  if (i2cReadBytes(0xF6, 2, result))
   {
-	  return 0;
+	ut = (((uint16_t) result[0] << 8) | result[1]);
+	return ut;
   }
   else
   {
-	  return ut;  
-  }
+	return 0;
+  }	
 }
 
 // Read the uncompensated pressure value
 unsigned long bmp085ReadUP()
 {
-  //unsigned char msb, lsb, xlsb;
   unsigned long up = 0;
   
   // Write 0x34+(OSS<<6) into register 0xF4

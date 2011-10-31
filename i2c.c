@@ -25,7 +25,7 @@
  * Thus, normal operation should not require more than 100 iterations
  * to get the device to respond to a selection.
  */
-#define MAX_ITER 1600
+#define MAX_ITER 200
 
 /*
  * Saved TWI status register, for error messages only.  We need to
@@ -84,7 +84,7 @@ i2cReadBytes(uint16_t addr, int len, uint8_t *buf)
 {
   uint8_t sla, twcr;
   uint8_t rv = 0;
-  uint16_t n = 0;
+  uint8_t n = 0;
   
   sla = slaveAddr;
 
@@ -237,7 +237,7 @@ i2cWriteByte(uint16_t addr, uint8_t val)
 {
   uint8_t sla;
   uint8_t rv = 0;
-  uint16_t n = 0;
+  uint8_t n = 0;
   
   sla = slaveAddr;
 
