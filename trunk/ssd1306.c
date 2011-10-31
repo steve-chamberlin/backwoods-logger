@@ -31,15 +31,13 @@ volatile uint8_t graphDrawPoints[GRAPH_COUNT];
 
 inline void ssd1306_write(uint8_t dc, uint8_t c) 
 {  	
-	// unrolled loops for maximum LCD update speed
 	if (dc)
 		OLED_CONTROL_PORT |= (1<<OLED_DC);
 	else
 		OLED_CONTROL_PORT &= ~(1<<OLED_DC);
 		
 	OLED_CONTROL_PORT &= ~(1<<OLED_CS);
-  	
-#if 0	  
+  		  
 	for (uint8_t i = 0; i < 8; i++)  
 	{						
 		OLED_DATA_PORT &= ~(1<<OLED_CLK); 
@@ -53,96 +51,6 @@ inline void ssd1306_write(uint8_t dc, uint8_t c)
 					
 		OLED_DATA_PORT |= (1<<OLED_CLK); 			
 	}
-#else
-	if (c)
-	{
-		uint8_t mask = 0x80;
-	
-		OLED_DATA_PORT &= ~(1<<OLED_CLK); 
-		if (c & mask)
-			OLED_DATA_PORT |= (1<<OLED_MOSI);
-		else
-			OLED_DATA_PORT &= ~(1<<OLED_MOSI);
-		OLED_DATA_PORT |= (1<<OLED_CLK); 				
-		c <<= 1;
-		
-		OLED_DATA_PORT &= ~(1<<OLED_CLK); 
-		if (c & mask)
-			OLED_DATA_PORT |= (1<<OLED_MOSI);
-		else
-			OLED_DATA_PORT &= ~(1<<OLED_MOSI);
-		OLED_DATA_PORT |= (1<<OLED_CLK); 		
-		c <<= 1;
-	
-		OLED_DATA_PORT &= ~(1<<OLED_CLK); 
-		if (c & mask)
-			OLED_DATA_PORT |= (1<<OLED_MOSI);
-		else
-			OLED_DATA_PORT &= ~(1<<OLED_MOSI);
-		OLED_DATA_PORT |= (1<<OLED_CLK); 			
-		c <<= 1;
-		
-		OLED_DATA_PORT &= ~(1<<OLED_CLK); 
-		if (c & mask)
-			OLED_DATA_PORT |= (1<<OLED_MOSI);
-		else
-			OLED_DATA_PORT &= ~(1<<OLED_MOSI);
-		OLED_DATA_PORT |= (1<<OLED_CLK); 		
-		c <<= 1;
-	
-		OLED_DATA_PORT &= ~(1<<OLED_CLK); 
-		if (c & mask)
-			OLED_DATA_PORT |= (1<<OLED_MOSI);
-		else
-			OLED_DATA_PORT &= ~(1<<OLED_MOSI);
-		OLED_DATA_PORT |= (1<<OLED_CLK); 			
-		c <<= 1;
-		
-		OLED_DATA_PORT &= ~(1<<OLED_CLK); 
-		if (c & mask)
-			OLED_DATA_PORT |= (1<<OLED_MOSI);
-		else
-			OLED_DATA_PORT &= ~(1<<OLED_MOSI);
-		OLED_DATA_PORT |= (1<<OLED_CLK); 		
-		c <<= 1;
-	
-		OLED_DATA_PORT &= ~(1<<OLED_CLK); 
-		if (c & mask)
-			OLED_DATA_PORT |= (1<<OLED_MOSI);
-		else
-			OLED_DATA_PORT &= ~(1<<OLED_MOSI);
-		OLED_DATA_PORT |= (1<<OLED_CLK); 		 		
-		c <<= 1;
-		
-		OLED_DATA_PORT &= ~(1<<OLED_CLK); 
-		if (c & mask)
-			OLED_DATA_PORT |= (1<<OLED_MOSI);
-		else
-			OLED_DATA_PORT &= ~(1<<OLED_MOSI);
-		OLED_DATA_PORT |= (1<<OLED_CLK); 		
-		c <<= 1;
-	}
-	else
-	{
-		OLED_DATA_PORT &= ~(1<<OLED_MOSI);
-		OLED_DATA_PORT &= ~(1<<OLED_CLK); 
-		OLED_DATA_PORT |= (1<<OLED_CLK); 		
-		OLED_DATA_PORT &= ~(1<<OLED_CLK); 
-		OLED_DATA_PORT |= (1<<OLED_CLK); 		
-		OLED_DATA_PORT &= ~(1<<OLED_CLK); 
-		OLED_DATA_PORT |= (1<<OLED_CLK); 		
-		OLED_DATA_PORT &= ~(1<<OLED_CLK); 
-		OLED_DATA_PORT |= (1<<OLED_CLK); 		
-		OLED_DATA_PORT &= ~(1<<OLED_CLK); 
-		OLED_DATA_PORT |= (1<<OLED_CLK); 		
-		OLED_DATA_PORT &= ~(1<<OLED_CLK); 
-		OLED_DATA_PORT |= (1<<OLED_CLK); 		
-		OLED_DATA_PORT &= ~(1<<OLED_CLK); 
-		OLED_DATA_PORT |= (1<<OLED_CLK); 		
-		OLED_DATA_PORT &= ~(1<<OLED_CLK); 
-		OLED_DATA_PORT |= (1<<OLED_CLK); 		
-	}			
-#endif
 		
 	OLED_CONTROL_PORT |= (1<<OLED_CS);
 	
@@ -246,29 +154,12 @@ void ssd1306_clear()
 	OLED_CONTROL_PORT &= ~(1<<OLED_CS);
 	OLED_DATA_PORT &= ~(1<<OLED_MOSI);
 		
-	for (uint8_t y=0; y<SSD1306_HEIGHT/8; y++)
-	{
-		for (uint8_t x=0; x<SSD1306_WIDTH; x++)
-		{
-			OLED_DATA_PORT &= ~(1<<OLED_CLK);
-			OLED_DATA_PORT |= (1<<OLED_CLK); 		
-			OLED_DATA_PORT &= ~(1<<OLED_CLK); 
-			OLED_DATA_PORT |= (1<<OLED_CLK); 		
-			OLED_DATA_PORT &= ~(1<<OLED_CLK); 
-			OLED_DATA_PORT |= (1<<OLED_CLK); 		
-			OLED_DATA_PORT &= ~(1<<OLED_CLK); 
-			OLED_DATA_PORT |= (1<<OLED_CLK); 		
-			OLED_DATA_PORT &= ~(1<<OLED_CLK); 
-			OLED_DATA_PORT |= (1<<OLED_CLK); 		
-			OLED_DATA_PORT &= ~(1<<OLED_CLK); 
-			OLED_DATA_PORT |= (1<<OLED_CLK); 		
-			OLED_DATA_PORT &= ~(1<<OLED_CLK); 
-			OLED_DATA_PORT |= (1<<OLED_CLK); 		
-			OLED_DATA_PORT &= ~(1<<OLED_CLK); 
-			OLED_DATA_PORT |= (1<<OLED_CLK); 		 			
-		}
-	}
-	
+	for (uint16_t i=0; i<SSD1306_WIDTH*(SSD1306_HEIGHT/8); i++)
+	{		
+		OLED_DATA_PORT &= ~(1<<OLED_CLK);
+		OLED_DATA_PORT |= (1<<OLED_CLK); 	
+	}				
+			
 	OLED_CONTROL_PORT |= (1<<OLED_CS);
 	
 	// leave data pin high
@@ -318,38 +209,6 @@ void LcdSetBacklight(uint8_t on)
 {
 	// nop
 }
-
-#if 0
-void LcdGoto(uint8_t x, uint8_t y)
-{
-	ssd1306_goto(x, y);	
-}
-
-void LcdWrite(uint8_t dc, uint8_t data)
-{
-	ssd1306_write(dc, data);
-}
-
-void LcdCharacter(char character, uint8_t inverse)
-{
-	ssd1306_char(character, inverse);	
-}
-
-void LcdString(char *characters)
-{
-	ssd1306_string(characters, TEXT_NORMAL);	
-}
-
-void LcdTinyString(char *characters, uint8_t inverse)
-{
-	ssd1306_string(characters, inverse);
-}
-
-void LcdTinyStringFramed(char *characters)
-{
-	ssd1306_string(characters, TEXT_NORMAL);
-}
-#endif
 
 void LcdDrawHeading(char *characters, uint8_t inverse)
 {
