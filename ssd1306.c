@@ -547,24 +547,30 @@ void LcdDrawGraph2(uint8_t timescaleNumber, uint8_t type, uint8_t cursorPos, uin
 	}
 	else
 	{
-		char timeStr[6];
-		if (type == GRAPH_TEMPERATURE)
-		{
-			strcpy_P(str, PSTR("TEMP"));
-		}
-		else if (type == GRAPH_PRESSURE)
-		{
-			strcpy_P(str, PSTR("PRESSURE"));
-		}
-		else
-		{
-			strcpy_P(str, PSTR("ALTITUDE"));	
-		}
-		
-		strcat_P(str, PSTR(" PAST "));	
-		strcat(str, MakeApproxTimeString(timeStr, minutesPerSample[timescaleNumber] * SAMPLES_PER_GRAPH));		
-		LcdDrawHeading(str, TEXT_INVERSE);
+		LcdDrawTitle(type, timescaleNumber, TEXT_INVERSE);
 	}	
+}
+
+void LcdDrawTitle(uint8_t graphType, uint8_t timescaleNumber, uint8_t inverse)
+{
+	char str[21];
+	
+	if (graphType == GRAPH_TEMPERATURE)
+	{
+		strcpy_P(str, PSTR("TEMP"));
+	}
+	else if (graphType == GRAPH_PRESSURE)
+	{
+		strcpy_P(str, PSTR("PRESSURE"));
+	}
+	else
+	{
+		strcpy_P(str, PSTR("ALTITUDE"));	
+	}
+		
+	strcat_P(str, PSTR(" PAST "));	
+	strcat_P(&str[strlen(str)], scaleStrings[timescaleNumber]);	
+	LcdDrawHeading(str, inverse);
 }
 
 void LcdMakeGraphYAxis(uint8_t type, int yminlabel, int ymaxlabel, uint8_t* yMinBuffer, uint8_t* yMaxBuffer, uint8_t* yMinSize, uint8_t* yMaxSize)

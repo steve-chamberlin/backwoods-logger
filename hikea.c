@@ -368,6 +368,7 @@ void DrawMenu()
 		strncpy_P(str, pMenuItem, 21);
 		LcdTinyString(str, topMenuItemIndex+i == selectedMenuItemIndex ? TEXT_INVERSE : TEXT_NORMAL);
 		
+		// draw up/down arrows if there are more menu choices than fit on the screen
 		if (i == 0 && topMenuItemIndex != 0)
 		{
 			LcdGoto(LCD_WIDTH-charWidth,i+1);
@@ -1448,17 +1449,9 @@ void MakeDataString(char* str, uint8_t dataType)
 			}			
 			else
 			{
-				if (timeToGoal / 60 < 10)
-				{
-					strcat_P(str, PSTR("0"));
-				}	
-				ltoa(timeToGoal / 60, &str[strlen(str)], 10);
+				AppendTwoDigitNumber(str, timeToGoal / 60);
 				strcat_P(str, PSTR(":"));
-				if (timeToGoal % 60 < 10)
-				{
-					strcat_P(str, PSTR("0"));
-				}	
-				ltoa(timeToGoal % 60, &str[strlen(str)], 10);
+				AppendTwoDigitNumber(str, timeToGoal % 60);
 			}
 	
 		}				
@@ -1642,11 +1635,7 @@ void MakeDataString(char* str, uint8_t dataType)
 			itoa(tripTime / 60, &str[strlen(str)], 10);
 			strcat_P(str, PSTR(":"));
 			tripTime = tripTime % 60;
-			if (tripTime < 10)
-			{
-				strcat_P(str, PSTR("0"));
-			}
-			itoa(tripTime, &str[strlen(str)], 10);
+			AppendTwoDigitNumber(str, tripTime);
 			
 			if (ShakeIsMoving())
 			{
@@ -1875,22 +1864,7 @@ void DrawModeScreen()
 	}
 	else if (mode == MODE_GRAPH)
 	{
-		if (parentMode == MODE_TEMP_GRAPH)
-		{
-			strcpy_P(str, PSTR("TEMP"));
-		}
-		else if (parentMode == MODE_PRESSURE_GRAPH)
-		{
-			strcpy_P(str, PSTR("PRESSURE"));
-		}
-		else
-		{
-			strcpy_P(str, PSTR("ALTITUDE"));	
-		}
-		
-		strcat_P(str, PSTR(" PAST "));	
-		MakeApproxTimeString(&str[strlen(str)], minutesPerSample[submode] * SAMPLES_PER_GRAPH);		
-		LcdDrawHeading(str, menuLevel == 0);
+		LcdDrawTitle(parentMode==MODE_TEMP_GRAPH ? GRAPH_TEMPERATURE : (parentMode==MODE_PRESSURE_GRAPH ? GRAPH_PRESSURE : GRAPH_ALTITUDE), submode, menuLevel == 0);
 	
 		if (menuLevel == 1)
 		{
@@ -2029,11 +2003,7 @@ void DrawModeScreen()
 		LcdTinyString(str, selectedMenuItemIndex==0 ? TEXT_INVERSE : TEXT_NORMAL);
 				
 		strcpy_P(str, PSTR(" "));
-		if (setting_day < 10)
-		{
-			strcat_P(str, PSTR("0"));
-		}
-		itoa(setting_day, &str[strlen(str)], 10);
+		AppendTwoDigitNumber(str, setting_day);
 		strcat_P(str, PSTR(" "));
 		LcdTinyString(str, selectedMenuItemIndex==1 ? TEXT_INVERSE : TEXT_NORMAL);
 			
@@ -2045,31 +2015,19 @@ void DrawModeScreen()
 		LcdGoto(2*4,4);
 		uint8_t hr = (setting_hour == 0 || setting_hour == 12) ? 12 : setting_hour % 12;
 		strcpy_P(str, PSTR(" "));
-		if (hr < 10)
-		{
-			strcat_P(str, PSTR("0"));
-		}
-		itoa(hr, &str[strlen(str)], 10);
+		AppendTwoDigitNumber(str, hr);
 		strcat_P(str, PSTR(" "));
 		LcdTinyString(str, selectedMenuItemIndex==3 ? TEXT_INVERSE : TEXT_NORMAL);
 				
 		LcdTinyString(":", TEXT_NORMAL);
 		strcpy_P(str, PSTR(" "));
-		if (setting_minute < 10)
-		{
-			strcat_P(str, PSTR("0"));
-		}
-		itoa(setting_minute, &str[strlen(str)], 10);
+		AppendTwoDigitNumber(str, setting_minute);
 		strcat_P(str, PSTR(" "));
 		LcdTinyString(str, selectedMenuItemIndex==4 ? TEXT_INVERSE : TEXT_NORMAL);		
 				
 		LcdTinyString(":", TEXT_NORMAL);
 		strcpy_P(str, PSTR(" "));
-		if (setting_second < 10)
-		{
-			strcat_P(str, PSTR("0"));
-		}
-		itoa(setting_second, &str[strlen(str)], 10);
+		AppendTwoDigitNumber(str, setting_second);
 		strcat_P(str, PSTR(" "));
 		LcdTinyString(str, selectedMenuItemIndex==5 ? TEXT_INVERSE : TEXT_NORMAL);	
 				

@@ -68,6 +68,7 @@ extern uint16_t minutesPerSample[];
 extern volatile short last_calibration_altitude;
 extern volatile uint8_t useImperialUnits;
 extern const char* unitStrings[];
+extern const char* scaleStrings[];
 extern int16_t minDataValues[];
 extern int16_t maxDataValues[];
 	

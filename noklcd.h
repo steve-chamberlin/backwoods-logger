@@ -49,6 +49,7 @@ void LcdString(char *characters);
 void LcdTinyString(char *characters, uint8_t inverse);
 void LcdTinyStringFramed(char *characters);
 void LcdDrawHeading(char *characters, uint8_t inverse);
+void LcdDrawTitle(uint8_t graphType, uint8_t timescaleNumber, uint8_t inverse);
 void LcdDrawGraph2(uint8_t timescaleNumber, uint8_t type, uint8_t cursorPos, uint8_t showCursor);
 void LcdMakeGraphYAxis(uint8_t type, int yminlabel, int ymaxlabel, uint8_t* yMinBUffer, uint8_t* yMaxBuffer, uint8_t* yMinSize, uint8_t* yMaxSize);
 void LcdDrawGraphLeftLegend(char *characters);

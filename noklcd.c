@@ -711,24 +711,30 @@ void LcdDrawGraph2(uint8_t timescaleNumber, uint8_t type, uint8_t cursorPos, uin
 	}
 	else
 	{
-		char timeStr[6];
-		if (type == GRAPH_TEMPERATURE)
-		{
-			strcpy_P(str, PSTR("TEMP"));
-		}
-		else if (type == GRAPH_PRESSURE)
-		{
-			strcpy_P(str, PSTR("PRESSURE"));
-		}
-		else
-		{
-			strcpy_P(str, PSTR("ALTITUDE"));	
-		}
-		
-		strcat_P(str, PSTR(" PAST "));	
-		strcat(str, MakeApproxTimeString(timeStr, minutesPerSample[timescaleNumber] * SAMPLES_PER_GRAPH));		
-		LcdDrawHeading(str, TEXT_INVERSE);
+		LcdDrawTitle(type, timescaleNumber, TEXT_INVERSE);
 	}
+}
+
+void LcdDrawTitle(uint8_t graphType, uint8_t timescaleNumber, uint8_t inverse)
+{
+	char str[21];
+	
+	if (graphType == GRAPH_TEMPERATURE)
+	{
+		strcpy_P(str, PSTR("TEMP"));
+	}
+	else if (graphType == GRAPH_PRESSURE)
+	{
+		strcpy_P(str, PSTR("PRESSURE"));
+	}
+	else
+	{
+		strcpy_P(str, PSTR("ALTITUDE"));	
+	}
+		
+	strcat_P(str, PSTR(" PAST "));		
+	strcat_P(&str[strlen(str)], scaleStrings[timescaleNumber]);
+	LcdDrawHeading(str, inverse);
 }
 
 void LcdMakeGraphYAxis(uint8_t type, int yminlabel, int ymaxlabel, uint8_t* yMinBuffer, uint8_t* yMaxBuffer, uint8_t* yMinSize, uint8_t* yMaxSize)
@@ -862,65 +868,5 @@ void LcdDrawHeading(char *characters, uint8_t inverse)
 	LcdGoto(80,0);	
 	LcdTinyString(inverse ? ">" : "]", inverse);	
 }
-
-// ----------- SPI
-/*
-byte SpiTransfer(uint8_t _data) 
-{  
-	SPDR = _data;  
-	while (!(SPSR & (1<<SPIF))) {}  
-	return SPDR;
-}
-
-void SPIAttachInterrupt() {  SPCR |= 1<<SPIE;}
-void SPIDetachInterrupt() {  SPCR &= ~(1<<SPIE);}
-
-void SpiBegin() {  
-	// Set direction register for SCK and MOSI pin.  
-	// MISO pin automatically overrides to INPUT.  
-	// When the SS pin is set as OUTPUT, it can be used as  
-	// a general purpose output port (it doesn't influence  
-	// SPI operations).  
-	pinMode(SCK, OUTPUT);  
-	pinMode(MOSI, OUTPUT);  
-	pinMode(SS, OUTPUT);    
-	digitalWrite(SCK, 0);  
-	digitalWrite(MOSI, 0);  
-	digitalWrite(SS, 1);  
-	// Warning: if the SS pin ever becomes a LOW INPUT then SPI   
-	// automatically switches to Slave, so the data direction of   
-	// the SS pin MUST be kept as OUTPUT.  
-	SPCR |= (1<<MSTR);  
-	SPCR |= (1<<SPE);
-}
-	
-void SpiEnd() 
-{  
-	SPCR &= ~(1<<SPE);
-}
-
-void SpiSetBitOrder(bool lsbFirst)
-{  
-	if(lsbFirst) 
-	{    
-		SPCR |= (1<<DORD);  
-	} 
-	else 
-	{    
-		SPCR &= ~((1<<DORD));  
-	}
-}
-
-void SpiSetDataMode(uint8_t mode)
-{  
-	SPCR = (SPCR & ~SPI_MODE_MASK) | mode;
-}
-
-void SpiSetClockDivider(uint8_t rate)
-{  
-	SPCR = (SPCR & ~SPI_CLOCK_MASK) | (rate & SPI_CLOCK_MASK);  
-	SPSR = (SPSR & ~SPI_2XCLOCK_MASK) | ((rate >> 2) & SPI_2XCLOCK_MASK);
-}
-*/
 
 #endif // NOKIA_LCD
