@@ -94,6 +94,7 @@ void LcdPowerSave(uint8_t powerSaveOn);
 #define LcdTinyString(characters, inverse) ssd1306_string(characters, inverse)
 #define LcdTinyStringFramed(characters) ssd1306_string(characters, TEXT_NORMAL)
 void LcdDrawHeading(char *characters, uint8_t inverse);
+void LcdDrawTitle(uint8_t graphType, uint8_t timescaleNumber, uint8_t inverse);
 void LcdDrawGraph2(uint8_t timescaleNumber, uint8_t type, uint8_t cursorPos, uint8_t showCursor);
 void LcdMakeGraphYAxis(uint8_t type, int yminlabel, int ymaxlabel, uint8_t* yMinBUffer, uint8_t* yMaxBuffer, uint8_t* yMinSize, uint8_t* yMaxSize);
 void LcdDrawGraphLeftLegend(char *characters);

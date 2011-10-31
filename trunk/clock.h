@@ -28,12 +28,11 @@ extern volatile uint8_t clock_year; // year - 2000
 
 extern volatile uint32_t clock_elapsedQuarterSeconds;
 
+void AppendTwoDigitNumber(char* str, uint8_t val);
 char* MakeDateString(char* str, uint8_t day, uint8_t month);
 char* MakeShortTimeString(char* str, uint8_t hour, uint8_t minute);
 char* MakeTimeString(char* str, uint8_t hour, uint8_t minute, uint8_t second);
-char* MakeApproxTimeString(char* str, uint16_t minutes);
 char* MakePastTimeString(char* str, uint16_t timeAgo);
-uint8_t StrToMonth(PGM_P str);
 void ClockInit();
 void ClockTick();
 

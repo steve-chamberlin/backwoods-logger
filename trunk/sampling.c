@@ -57,12 +57,22 @@ uint8_t nextSampleIndex[NUM_SRAM_TIME_SCALES];
 #ifdef LOGGER_CLASSIC
 // classic: 90m, 8h, 1.75d
 uint16_t minutesPerSample[NUM_TIME_SCALES] = {1, 6, 30}; // must evenly divide 1440 for correct sample time detection
+const char scaleShort[] PROGMEM = "90m";
+const char scaleMed[] PROGMEM = "8h";
+const char scaleLong[] PROGMEM = "2d";	
 #endif
 #ifdef LOGGER_MINI
 // mini: 2h, 10h, 2.5d
 uint16_t minutesPerSample[NUM_TIME_SCALES] = {1, 5, 30}; // must evenly divide 1440 for correct sample time detection
+const char scaleShort[] PROGMEM = "2h";
+const char scaleMed[] PROGMEM = "10h";
+const char scaleLong[] PROGMEM = "2d";	
 #endif
 
+const char* scaleStrings[] = { 
+	scaleShort, scaleMed, scaleLong
+};
+	
 const char tempMetric[] PROGMEM = "`C";
 const char pressureMetric[] PROGMEM = " mb";
 const char altitudeMetric[] PROGMEM = " m";
