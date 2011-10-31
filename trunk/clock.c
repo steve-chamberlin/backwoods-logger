@@ -280,16 +280,7 @@ char* MakePastTimeString(char* str, uint16_t timeAgo)
 	
 void ClockInit()
 {
-	/*
-	clock_year = Str2ToByte((PGM_P)&dateStr[9]);
-	clock_month = StrToMonth((PGM_P)&dateStr[0]);
-	clock_day = Str2ToByte((PGM_P)&dateStr[4]);
-	clock_hour = Str2ToByte((PGM_P)&timeStr[0]);
-	clock_minute = Str2ToByte((PGM_P)&timeStr[3]);
-	clock_second = Str2ToByte((PGM_P)&timeStr[6]);
-	*/
-	
-	clock_year = 11;
+	clock_year = 0;
 	clock_month = 1;
 	clock_day = 1;
 	clock_hour = 0;

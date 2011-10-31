@@ -17,12 +17,9 @@
 #define BMP085_H_
 
 extern volatile float expectedSeaLevelPressure;
-extern volatile uint8_t bmpError;
 
-char bmp085Read(unsigned char address);
-int bmp085ReadInt(unsigned char address);
 void bmp085Reset();
-void bmp085Init();
+uint8_t bmp085Init();
 unsigned int bmp085ReadUT();
 unsigned long bmp085ReadUP();
 short bmp085ConvertTemperature(unsigned int ut);

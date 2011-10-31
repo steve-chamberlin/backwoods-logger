@@ -18,10 +18,7 @@
 
 #include <avr/pgmspace.h>
 
-extern const char dateStr[] PROGMEM;
-extern const char timeStr[] PROGMEM;
-
-extern char versionStr[];
+extern const char versionStr[] PROGMEM;
 
 void InitSettings();
 void DrawModeScreen();
