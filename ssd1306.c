@@ -154,7 +154,7 @@ void ssd1306_clear()
 	OLED_CONTROL_PORT &= ~(1<<OLED_CS);
 	OLED_DATA_PORT &= ~(1<<OLED_MOSI);
 		
-	for (uint16_t i=0; i<SSD1306_WIDTH*(SSD1306_HEIGHT/8); i++)
+	for (uint16_t i=0; i<SSD1306_WIDTH*SSD1306_HEIGHT; i++)
 	{		
 		OLED_DATA_PORT &= ~(1<<OLED_CLK);
 		OLED_DATA_PORT |= (1<<OLED_CLK); 	
