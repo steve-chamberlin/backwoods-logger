@@ -14,26 +14,17 @@
 */
 
 // Bosch BMP085 pressure/temperature sensor
-// I2C max 3.4 MHz
-// max 4.5 ms temperature conversion time
-// up to max 25.5 ms pressure conversion time in ultra-high resolution mode
-// need 100 nF cap between vcc and gnd
-// to read uncompensated temperature, write 0x2E into register 0xF4, wait 4.5 ms, read registers 0xF6 and 0xF7
-// to read uncompensated pressure, write 0x34 + (OSS<<6) into register 0xF4, wait 25.5 ms, read registers 0xF6, 0xF7, 0xF8
-// XCLR (active low) can be left floating if not used. Min pulse length 1 us
-// must wait 10 ms after reset before first communication
-// I2C address is 0xEF for read and 0xEE for write
 
 #include <avr/pgmspace.h>
 #include <util/delay.h>
 #include <math.h>
 
-#include "Wire/Wire.h"
+#include "i2c.h"
 #include "bmp085.h"
 
 #define BMP085_PIN_XCLR PC3
 
-#define BMP085_ADDRESS 0x77  // I2C address of BMP085
+#define BMP085_ADDRESS 0xEE  // I2C address of BMP085
 
 // Oversampling Setting
 #define OSS 3
@@ -58,66 +49,41 @@ int md;
 // so ...Temperature(...) must be called before ...Pressure(...).
 long b5; 
 
-// Read 1 byte from the BMP085 at 'address'
-char bmp085Read(unsigned char address)
-{  
-  Wire_beginTransmission(BMP085_ADDRESS);
-  Wire_send(address);
-  Wire_endTransmission();
-  
-  Wire_requestFrom(BMP085_ADDRESS, 1);
-  while(!Wire_available())
-    ;
-    
-  return Wire_receive();
+void bmp085Reset()
+{
+	expectedSeaLevelPressure = 101325.0f;
 }
 
-volatile uint8_t bmpError = 0;
+uint8_t i2cResult = 0;
 
 // Read 2 bytes from the BMP085
 // First byte will be from 'address'
 // Second byte will be from 'address'+1
 int bmp085ReadInt(unsigned char address)
 {
-  unsigned char msb, lsb;
-  
-  Wire_beginTransmission(BMP085_ADDRESS);
-  Wire_send(address);
-  bmpError = Wire_endTransmission(); 
-  if (bmpError != 0)
-  {
-	  return 0;
-  }
-  
-  Wire_requestFrom(BMP085_ADDRESS, 2);
-  while(Wire_available()<2)
-    ;
-  msb = Wire_receive();
-  lsb = Wire_receive();
-  
-  return (int) msb<<8 | lsb;
-}
-
-void bmp085Reset()
-{
-	expectedSeaLevelPressure = 101325.0f;
+  uint8_t result[2];
+  i2cResult = i2cReadBytes(address, 2, result);
+  return (int16_t)(((uint16_t) result[0] << 8) | result[1]);
 }
 
 // Stores all of the bmp085's calibration values into global variables
 // Calibration values are required to calculate temp and pressure
 // This function should be called at the beginning of the program
-void bmp085Init()
+//
+// Returns non-zero value if initialization was successful, 0 if initialization failed.
+uint8_t bmp085Init()
 {
-  bmpError = 0;
   DDRC |= (1<<BMP085_PIN_XCLR);
 	
   PORTC &= ~(1<<BMP085_PIN_XCLR); 
   _delay_ms(1);
   PORTC |= (1<<BMP085_PIN_XCLR);
-		
+  _delay_ms(10);
+  		
   bmp085Reset();
   
-  Wire_begin();
+  i2cInit();
+  i2cSetAddress(BMP085_ADDRESS);
 		
   ac1 = bmp085ReadInt(0xAA);
   ac2 = bmp085ReadInt(0xAC);
@@ -129,7 +95,9 @@ void bmp085Init()
   b2 = bmp085ReadInt(0xB8);
   mb = bmp085ReadInt(0xBA);
   mc = bmp085ReadInt(0xBC);
-  md = bmp085ReadInt(0xBE);
+  md = bmp085ReadInt(0xBE);	
+			 
+  return i2cResult;
 }
 
 // Read the uncompensated temperature value
@@ -139,66 +107,53 @@ unsigned int bmp085ReadUT()
   
   // Write 0x2E into Register 0xF4
   // This requests a temperature reading
-  Wire_beginTransmission(BMP085_ADDRESS);
-  Wire_send(0xF4);
-  Wire_send(0x2E);
-  bmpError = Wire_endTransmission();
-  if (bmpError != 0)
-  {
-	  return 0;
-  }
+  i2cWriteByte(0xF4, 0x2E);
   
   // Wait at least 4.5ms
   _delay_ms(5);
   
   // Read two bytes from registers 0xF6 and 0xF7
   ut = bmp085ReadInt(0xF6);
-  return ut;
+  
+  // Return 0 if i2c was unsuccessful, else return the value read
+  if (i2cResult == 0)
+  {
+	  return 0;
+  }
+  else
+  {
+	  return ut;  
+  }
 }
 
 // Read the uncompensated pressure value
 unsigned long bmp085ReadUP()
 {
-  unsigned char msb, lsb, xlsb;
+  //unsigned char msb, lsb, xlsb;
   unsigned long up = 0;
   
   // Write 0x34+(OSS<<6) into register 0xF4
   // Request a pressure reading w/ oversampling setting
-  Wire_beginTransmission(BMP085_ADDRESS);
-  Wire_send(0xF4);
-  Wire_send(0x34 + (OSS<<6));
-  bmpError = Wire_endTransmission();
-  if (bmpError != 0)
-  {
-	  return 0;
-  }
- 
+  i2cWriteByte(0xF4, 0x34 + (OSS<<6));
+  
   // Wait for conversion, delay time dependent on OSS
   _delay_ms(2 + (3<<OSS));
+  
   // Read register 0xF6 (MSB), 0xF7 (LSB), and 0xF8 (XLSB)
-  Wire_beginTransmission(BMP085_ADDRESS);
-  Wire_send(0xF6);
-  bmpError = Wire_endTransmission();
-  if (bmpError != 0)
+  // Return the value read if i2c was successful, else return 0
+  uint8_t result[3];
+  if (i2cReadBytes(0xF6, 3, result))
   {
-	  return 0;
+	up = (((unsigned long) result[0] << 16) | ((unsigned long) result[1] << 8) | (unsigned long) result[2]) >> (8-OSS);
+	return up;
   }
-  
-  Wire_requestFrom(BMP085_ADDRESS, 3);
-  
-  // Wait for data to become available
-  while(Wire_available() < 3)
-    ;
-  msb = Wire_receive();
-  lsb = Wire_receive();
-  xlsb = Wire_receive();
-  
-  up = (((unsigned long) msb << 16) | ((unsigned long) lsb << 8) | (unsigned long) xlsb) >> (8-OSS);
-  
-  return up;
+  else
+  {
+	return 0;
+  }	
 }
 
-// Calculate temperature given ut.
+// Calculate temperature given raw ut.
 // Value returned will be in units of 0.1 deg C
 short bmp085ConvertTemperature(unsigned int ut)
 {
@@ -211,10 +166,10 @@ short bmp085ConvertTemperature(unsigned int ut)
   return ((b5 + 8)>>4);  
 }
 
-// Calculate pressure given up
+// Calculate pressure given raw up
 // calibration values must be known
 // b5 is also required so bmp085GetTemperature(...) must be called first.
-// Value returned will be pressure in units of Pa.
+// Value returned will be pressure in units of Pa (hundredths of a millibar)
 long bmp085ConvertPressure(unsigned long up)
 {
   long x1, x2, x3, b3, b6, p;

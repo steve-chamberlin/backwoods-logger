@@ -36,7 +36,8 @@ void SpeakerInit()
 void SpeakerOff()
 {
 	speaker_in_use = 0;
-	PORTD &= ~((1<<SPEAKER_PIN) | (1<<SPEAKER_GROUND_PIN));
+	PORTD &= ~(1<<SPEAKER_PIN);
+	PORTD &= ~(1<<SPEAKER_GROUND_PIN);
     TCCR0A = 0; // disable OCR0A pin 	
     TIMSK1 = 0; // disable timer 1 interrupts
 	TIFR1 = 0; // clear timer 1 interrupt flags 
@@ -54,11 +55,15 @@ void SpeakerOff()
 
 void SpeakerNextTone()
 {
-	uint8_t tone0 = 64;
+	uint8_t tone0;
 	
 	if (speaker_toneCount == 0)
 	{
-		if (speaker_beepType == BEEP_NEXT || speaker_beepType == BEEP_ENTER || speaker_beepType == BEEP_TIMER_END)
+		if (speaker_beepType == BEEP_NEXT || speaker_beepType == BEEP_ENTER 
+#ifdef SHAKE_SENSOR
+		|| speaker_beepType == BEEP_TIMER_END
+#endif
+		)
 		{
 			tone0 = 64;
 		}
@@ -74,7 +79,11 @@ void SpeakerNextTone()
 			SpeakerOff();
 			return;
 		}
-		else if (speaker_beepType == BEEP_EXIT || speaker_beepType == BEEP_TIMER_START)
+		else if (speaker_beepType == BEEP_EXIT
+#ifdef SHAKE_SENSOR
+		 || speaker_beepType == BEEP_TIMER_START
+#endif
+		)
 		{
 			tone0 = 64;
 		}
@@ -83,6 +92,7 @@ void SpeakerNextTone()
 			tone0 = 96;
 		}
 	}
+#ifdef SHAKE_SENSOR	
 	else if (speaker_toneCount == 2 && speaker_beepType == BEEP_TIMER_START)
 	{
 		tone0 = 64;
@@ -91,6 +101,7 @@ void SpeakerNextTone()
 	{
 		tone0 = 96;
 	}
+#endif	
 	else
 	{
 		SpeakerOff();
@@ -114,13 +125,15 @@ void SpeakerNextTone()
     TCCR1A = 0; // CTC OCR0A mode, (WGM13 and WGM12 in TCCR1B) 
 	TCCR1B = (1<<CS12) | (1<<CS10) | (1<<WGM12) ; // prescale clock/1024
 	// datasheet section 16.3: To do a 16-bit write, the high byte must be written before the low byte.
-		
+
+#ifdef SHAKE_SENSOR		
 	if (speaker_beepType == BEEP_TIMER_START || speaker_beepType == BEEP_TIMER_END)
 	{
 		OCR1AH = (BEEP_DURATION_LONG >> 8);
 		OCR1AL = (BEEP_DURATION_LONG & 0xFF);
 	}
 	else
+#endif	
 	{
 		OCR1AH = (BEEP_DURATION >> 8);
 		OCR1AL = (BEEP_DURATION & 0xFF);		

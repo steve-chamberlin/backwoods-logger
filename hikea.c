@@ -93,8 +93,7 @@ volatile uint8_t unlockState = 0;
 // main screen
 
 // system screen	
-const char dateStr[] PROGMEM = __DATE__;
-const char timeStr[] PROGMEM = __TIME__;
+const char versionStr[] PROGMEM = "1.0.0";
 
 volatile uint8_t setting_second;
 volatile uint8_t setting_minute;
@@ -189,9 +188,6 @@ const char* systemMenu[] PROGMEM = {
 	system9, 
 	NULL 
 };
-
-// pre-baked version number string
-char versionStr[11];
 
 // data type menu
 
@@ -1087,29 +1083,27 @@ int main(void)
 #endif
 	
 	sei();	
-	
-	uint8_t try = 0;
-	
-	do {
-		bmp085Init(); // interrupts must be enabled before initializing BMP085, since it uses I2C (aka TWI)
-		if (bmpError != 0)	
-		{
-			LcdGoto(0,1);
-			char str[21];
-			strcpy_P(str, PSTR("Sensor err: "));
-			itoa(bmpError, &str[strlen(str)], 10);
-			LcdString(str);
-			
-			LcdGoto(0,2);
-			strcpy_P(str, PSTR("Retry "));
-			itoa(try, &str[strlen(str)], 10);
-			LcdString(str);
+
+	while (bmp085Init() == 0) 
+	{
+#ifdef SENSOR_ERROR_REPORT		
+		static uint8_t try = 0;
+		char str[21];
 		
-			_delay_ms(2000);
-			try++;
-		}	
-	} while (bmpError != 0);
-	
+		LcdGoto(0,1);
+		strcpy_P(str, PSTR("Sensor error"));
+		LcdString(str);
+			
+		LcdGoto(0,2);
+		strcpy_P(str, PSTR("Retry "));
+		itoa(try, &str[strlen(str)], 10);
+		LcdString(str);
+		
+		_delay_ms(2000);
+		try++;		
+#endif		
+	}
+
 	// initialize timer 2 to use an external 32768 Hz crystal 
     ASSR |= (1 << AS2); // use TOSC1/TOSC2 oscillator as timer 2 clock	
 	ASSR &= ~(1 << EXCLK); // use a crystal oscillator rather than an external clock
@@ -1129,32 +1123,6 @@ int main(void)
 				
 	// disable unused peripherals
 	PRR |= (1<<PRTWI) | (1<<PRSPI) | (1<<PRTIM1) | (1<<PRTIM0) | (1<<PRUSART0) | (1<<PRADC);
-	
-	// construct the version string
-	uint8_t ind = 0;
-	versionStr[ind++] = pgm_read_byte(&dateStr[9]);
-	versionStr[ind++] = pgm_read_byte(&dateStr[10]);
-	uint8_t month = StrToMonth(dateStr);
-	versionStr[ind++] = '0' + (month/10);
-	versionStr[ind++] = '0' + (month%10);
-	uint8_t dayTens = pgm_read_byte(&dateStr[4]);
-	if (dayTens == ' ')
-	{
-		versionStr[ind++] = '0';
-	}
-	else
-	{
-		versionStr[ind++] = dayTens;
-	}		
-	versionStr[ind++] = pgm_read_byte(&dateStr[5]);
-	for (uint8_t i=0; i<5; i++)
-	{
-		if (i != 2)
-		{
-			versionStr[ind++] = pgm_read_byte(&timeStr[i]);		
-		}			
-	}	
-	versionStr[ind++] = 0;
 		
 	newSampleNeeded = 1;
 					
@@ -1196,9 +1164,9 @@ int main(void)
 		
 			unsigned int ut = bmp085ReadUT();	
 			tempc = bmp085ConvertTemperature(ut);
-			unsigned long up = bmp085ReadUP();	
+			unsigned long up = bmp085ReadUP();
 			pressure = bmp085ConvertPressure(up);
-			
+						
 			PRR |= (1<<PRTWI); // disable I2C
 				
 			if (newSampleNeeded)
@@ -1937,7 +1905,8 @@ void DrawModeScreen()
 		{
 			LcdGoto(0,1);
 			LcdTinyString("Version ", TEXT_NORMAL);
-			LcdTinyString(versionStr, TEXT_NORMAL);
+			strcpy_P(str, versionStr);
+			LcdTinyString(str, TEXT_NORMAL);
 					
 			long avrVcc = readVcc();
 			avrVcc = (avrVcc + 5) / 10; // round to hundredths of a volt
