@@ -26,10 +26,11 @@
 
 #ifdef NOKIA_LCD
 #include "noklcd.h"
+#include "logo-84.h"
 #endif
 #ifdef SSD1306_LCD
 #include "ssd1306.h"
-#include "logo.h"
+#include "logo-128.h"
 #endif
 
 #ifdef SHAKE_SENSOR
@@ -93,7 +94,7 @@ volatile uint8_t unlockState = 0;
 // main screen
 
 // system screen	
-const char versionStr[] PROGMEM = "1.0.0";
+const char versionStr[] PROGMEM = "1.0.1";
 
 volatile uint8_t setting_second;
 volatile uint8_t setting_minute;
@@ -1085,6 +1086,9 @@ int main(void)
 	
 	sei();	
 
+	LcdGoto(0, 0);
+	LcdString("Sensor init...");
+	
 	while (bmp085Init() == 0) 
 	{
 #ifdef SENSOR_ERROR_REPORT		
@@ -1792,17 +1796,20 @@ void DrawModeScreen()
 	if (unlockState != 0)
 	{
 #ifdef SSD1306_LCD	
+		uint16_t logoBytes = 128*6;
+		uint8_t topRow = 6;
+#endif
+#ifdef NOKIA_LCD	
+		uint16_t logoBytes = 84*4;
+		uint8_t topRow = 4;
+#endif
+
 		LcdGoto(0,0);
-		for (int i=0; i<128*6; i++)
+		for (int i=0; i<logoBytes; i++)
 		{
 			LcdWrite(LCD_DATA, pgm_read_byte(&logo[i]));
 		}
 		
-		uint8_t topRow = 6;
-#endif	
-#ifdef NOKIA_LCD	
-		uint8_t topRow = 1;
-#endif
 		LcdGoto(0,topRow);
 		strcpy_P(str, PSTR(" hold PREV and NEXT"));
 		LcdTinyString(str, TEXT_NORMAL);
