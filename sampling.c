@@ -329,10 +329,7 @@ void SamplingInit(uint8_t forceEEpromClear)
 	uint16_t signature = eeprom_read_word((uint16_t*)EEPROM_HEADER_BASE);
 	if (signature == EEPROM_SIGNATURE && !forceEEpromClear)
 	{
-		// fill the SRAM timescales with data from EEPROM?
-		// logger is just starting up, so current time is unknown	
-		// probably not worthwhile
-		LcdString("EEPROM sig OK");
+		//LcdString("EEPROM sig OK");
 	}
 	else
 	{	
