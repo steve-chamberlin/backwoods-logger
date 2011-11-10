@@ -2533,6 +2533,7 @@ ISR(PCINT0_vect)
 	{
 		// ignore button press, exit hibernation, wake screen and backlight
 		hibernating = 0;
+		lastButtonUpTime = now;
 		// put LCD in normal mode
 		LcdPowerSave(0);
 		screenClearNeeded = 1;
