@@ -50,6 +50,11 @@
 
 #define INVALID_RATE 0x7FFFFFFF
 
+#define DEBOUNCE_TIME 25
+
+uint8_t anyButtonDown = 0;
+uint32_t lastButtonDownTime = 0;
+uint32_t lastButtonUpTime = 0;
 uint8_t sleepDelay;
 
 #define UINT_MOD(value, modulus) ((uint8_t)(value) > 0xF0 ? (value) + (modulus) : (uint8_t)(value) >= (modulus) ? (value) - (modulus) : (value))
@@ -94,7 +99,7 @@ volatile uint8_t unlockState = 0;
 // main screen
 
 // system screen	
-const char versionStr[] PROGMEM = "1.0.1";
+const char versionStr[] PROGMEM = "1.0.2";
 
 volatile uint8_t setting_second;
 volatile uint8_t setting_minute;
@@ -1792,7 +1797,7 @@ void HandleSnapshotsSelect()
 void DrawModeScreen()
 {
 	char str[22];
-		
+	
 	if (unlockState != 0)
 	{
 #ifdef SSD1306_LCD	
@@ -2277,8 +2282,6 @@ void DrawModeScreen()
 	}
 }
 
-uint32_t lastButtonTime = 0;
-
 void HandlePrevNext(uint8_t step)
 {		
 	if (exploringGraph)
@@ -2463,29 +2466,39 @@ ISR(TIMER2_OVF_vect)
 	if (!hibernating)
 	{
 		uint32_t now = (clock_elapsedQuarterSeconds<<8) | TCNT2;
-		uint32_t timeSinceLastButton = now - lastButtonTime;
+		uint32_t delaySinceLastButtonDown = now - lastButtonDownTime;
 		
 		// NEXT/PREV repeat?
-		if (unlockState == 0 && (bit_is_clear(PINB, BUTTON_NEXT) || bit_is_clear(PINB, BUTTON_PREV)))
+		if (unlockState == 0 && delaySinceLastButtonDown > 500 && (bit_is_clear(PINB, BUTTON_NEXT) || bit_is_clear(PINB, BUTTON_PREV)))
 		{
-			if (timeSinceLastButton > 6000)
+			// set default step size
+			uint8_t nextStep = 4, prevStep = 0xFC;
+			
+			// use larger steps if the button has been held longer
+			if (delaySinceLastButtonDown > 6000)
 			{
-				HandlePrevNext(bit_is_clear(PINB, BUTTON_NEXT) ? 40 : 0xD8);
-				screenUpdateNeeded = 1;
+				nextStep = 40;
+				prevStep = 0xD8;
 			}
-			else if (timeSinceLastButton > 3000)
+			else if (delaySinceLastButtonDown > 3000)
 			{			
-				HandlePrevNext(bit_is_clear(PINB, BUTTON_NEXT) ? 12 : 0xF4);
-				screenUpdateNeeded = 1;
+				nextStep = 12;
+				prevStep = 0xF4;				
 			}				
-			else if (timeSinceLastButton > 500)
-			{			
-				HandlePrevNext(bit_is_clear(PINB, BUTTON_NEXT) ? 4 : 0xFC);
-				screenUpdateNeeded = 1;
-			}			
+			
+			// always step the mode screens by +/-1
+			if (mode < MODE_TOP_LEVEL_COUNT && menuLevel == 0)
+			{
+				nextStep = 1;
+				prevStep = 0xFF;
+			}
+			
+			// perform the step
+			HandlePrevNext(bit_is_clear(PINB, BUTTON_NEXT) ? nextStep : prevStep);
+			screenUpdateNeeded = 1;
 		}
 		
-		if (timeSinceLastButton > 1024L*sleepDelay)
+		if (!anyButtonDown && now - lastButtonUpTime > 1024L*sleepDelay)
 		{
 			// enter hibernation
 			hibernating = 1;
@@ -2509,27 +2522,16 @@ ISR(PCINT0_vect)
 	// start of serial input?
 	if (bit_is_clear(PINB, PB4))
 	{
-		// if hibernating, wake up
-		/*if (hibernating)
-		{
-			lastButtonTime = (clock_elapsedQuarterSeconds<<8) | TCNT2;
-			hibernating = 0;
-			// put LCD in normal mode
-			LcdPowerSave(0);
-			screenClearNeeded = 1;
-			screenUpdateNeeded = 1;
-			unlockState = 1;
-		}
-		*/
 		SerialDoCommand();
 		return;
 	}
-	
-	if (hibernating &&
-		(bit_is_clear(PINB, BUTTON_NEXT) || bit_is_clear(PINB, BUTTON_PREV) || bit_is_clear(PINB, BUTTON_SELECT)))
+
+	uint32_t now = (clock_elapsedQuarterSeconds<<8) | TCNT2;	
+	uint8_t anyButtonDownNew = bit_is_clear(PINB, BUTTON_NEXT) || bit_is_clear(PINB, BUTTON_PREV) || bit_is_clear(PINB, BUTTON_SELECT);
+		
+	if (hibernating && anyButtonDownNew)
 	{
 		// ignore button press, exit hibernation, wake screen and backlight
-		lastButtonTime = (clock_elapsedQuarterSeconds<<8) | TCNT2;
 		hibernating = 0;
 		// put LCD in normal mode
 		LcdPowerSave(0);
@@ -2538,9 +2540,6 @@ ISR(PCINT0_vect)
 		unlockState = 1;
 		return;
 	}
-	
-	uint32_t now = (clock_elapsedQuarterSeconds<<8) | TCNT2;
-	uint32_t timeSinceLastButton = now - lastButtonTime;
 	
 	if (unlockState == 1)
 	{
@@ -2551,7 +2550,7 @@ ISR(PCINT0_vect)
 	}
 	else if (unlockState == 2)
 	{
-		if (bit_is_set(PINB, BUTTON_NEXT) && bit_is_set(PINB, BUTTON_PREV) && bit_is_set(PINB, BUTTON_SELECT) && timeSinceLastButton > 250)
+		if (!anyButtonDownNew)
 		{
 			unlockState = 0;
 			screenClearNeeded = 1;
@@ -2562,16 +2561,30 @@ ISR(PCINT0_vect)
 	{
 		lcdResetNeeded = 1;
 	}
-	else if ((bit_is_clear(PINB, BUTTON_NEXT) || bit_is_clear(PINB, BUTTON_PREV)) && (timeSinceLastButton > 250))
-	{				
-		HandlePrevNext(bit_is_clear(PINB, BUTTON_NEXT) ? 1 : 0xFF);
-		lastButtonTime = (clock_elapsedQuarterSeconds<<8) | TCNT2;	
-		screenUpdateNeeded = 1;
-	}	
-	else if (bit_is_clear(PINB, BUTTON_SELECT) && (timeSinceLastButton > 250))
+	else if (anyButtonDownNew && !anyButtonDown)
 	{
-		HandleSelect();
-		lastButtonTime = (clock_elapsedQuarterSeconds<<8) | TCNT2;	
-		screenUpdateNeeded = 1;	
+		uint32_t delaySinceLastButtonUp = now - lastButtonUpTime;
+			
+		if ((bit_is_clear(PINB, BUTTON_NEXT) || bit_is_clear(PINB, BUTTON_PREV)) && (delaySinceLastButtonUp > DEBOUNCE_TIME))
+		{				
+			HandlePrevNext(bit_is_clear(PINB, BUTTON_NEXT) ? 1 : 0xFF);
+			screenUpdateNeeded = 1;
+		}	
+		else if (bit_is_clear(PINB, BUTTON_SELECT) && (delaySinceLastButtonUp > DEBOUNCE_TIME))
+		{
+			HandleSelect();
+			screenUpdateNeeded = 1;	
+		}
+		
+		// reset lastButtonDownTime at the first moment any button is down
+		lastButtonDownTime = now;		
 	}
+
+	// reset lastButtonUpTime at the first moment all buttons are up
+	if (!anyButtonDownNew && anyButtonDown)
+	{
+		lastButtonUpTime = now;
+	}
+
+	anyButtonDown = anyButtonDownNew;
 } 
