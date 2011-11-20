@@ -15,10 +15,11 @@
 
 HANDLE InitSerialPort(_TCHAR* portName, unsigned long speed);
 bool SendCommand(HANDLE hSerial, char cmd);
-bool GetBytes(HANDLE hSerial, char* pBuffer, int bytesToRead, unsigned char& checksum);
-bool GetResponseHeader(HANDLE hSerial);
-bool VerifyChecksum(HANDLE hSerial, unsigned char checksum);
-void GetFirmwareVersion(HANDLE hSerial);
+bool GetBytes(HANDLE hSerial, char* pBuffer, int bytesToRead, unsigned char& checksum, bool showOutput);
+bool GetResponseHeader(HANDLE hSerial, bool showOutput);
+bool VerifyChecksum(HANDLE hSerial, unsigned char checksum, bool showOutput);
+bool GetFirmwareVersion(HANDLE hSerial, bool showOutput);
+bool AdjustBitRate(HANDLE& hSerial, _TCHAR* portName, unsigned long& bitRate);
 void GetGraphs(HANDLE hSerial, _TCHAR* filename, bool saveAsCSV);
 void GetSnapshots(HANDLE hSerial, _TCHAR* filename, bool saveAsCSV);
 void AdjustTime(SYSTEMTIME& st, int minutesToSubtract);

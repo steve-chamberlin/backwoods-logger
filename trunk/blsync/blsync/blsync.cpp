@@ -34,6 +34,7 @@ int _tmain(int argc, _TCHAR* argv[])
     _TCHAR* graphFilename = 0;
     _TCHAR* snapshotFilename = 0;
     unsigned long baudRate = 38400;
+    bool userDefinedRate = false;
     bool reportVersion = false;
     bool saveAsCSV = true;
     
@@ -57,6 +58,7 @@ int _tmain(int argc, _TCHAR* argv[])
             else if (arg[1] == _T('b') && i+1 != argc) 
             {
                 // baud rate override
+                userDefinedRate = true;
                 baudRate = _wtoi(argv[i + 1]);
                 i++;
             } 
@@ -111,9 +113,14 @@ int _tmain(int argc, _TCHAR* argv[])
 
     HANDLE hSerial = InitSerialPort(portName, baudRate);
 
+    if (!userDefinedRate)
+    {
+        if (!AdjustBitRate(hSerial, portName, baudRate))
+            return 0;
+    }
     if (reportVersion)
     {
-        GetFirmwareVersion(hSerial);
+        GetFirmwareVersion(hSerial, true);
     }
 
     if (graphFilename != 0)
@@ -174,7 +181,7 @@ bool SendCommand(HANDLE hSerial, char cmd)
     Updates the checksum, which is passed by reference.
     Returns true if successful, false if an error occurred.
 */
-bool GetBytes(HANDLE hSerial, char* pBuffer, int bytesToRead, unsigned char& checksum)
+bool GetBytes(HANDLE hSerial, char* pBuffer, int bytesToRead, unsigned char& checksum, bool showOutput)
 {
     if (bytesToRead == 0)
         return true;
@@ -186,11 +193,13 @@ bool GetBytes(HANDLE hSerial, char* pBuffer, int bytesToRead, unsigned char& che
     }
     else if (dwBytesRead == 0)
     {
-         wcout << "Error: no response was received from the Logger." << endl;
+         if (showOutput)
+            wcout << "Error: no response was received from the Logger." << endl;
     }
     else if (dwBytesRead != bytesToRead)
     {
-         wcout << "Error: an incomplete response was received from the Logger." << endl;
+         if (showOutput)
+             wcout << "Error: an incomplete response was received from the Logger." << endl;
     }        
     else
     {
@@ -209,7 +218,7 @@ bool GetBytes(HANDLE hSerial, char* pBuffer, int bytesToRead, unsigned char& che
     Gets up to 300 bytes from the Logger, and stopping after the first occurrence of the string "LOG".
     Returns true if successful, false if an error occurred.
 */
-bool GetResponseHeader(HANDLE hSerial)
+bool GetResponseHeader(HANDLE hSerial, bool showOutput)
 {
     char* prefix = "LOG";
     char index = 0;
@@ -220,7 +229,7 @@ bool GetResponseHeader(HANDLE hSerial)
     
     while (readCount < 300)
     {
-        if (GetBytes(hSerial, szBuff, 1, checksum))
+        if (GetBytes(hSerial, szBuff, 1, checksum, showOutput))
         {
             readCount++;
            
@@ -250,7 +259,8 @@ bool GetResponseHeader(HANDLE hSerial)
 
     if (readCount > 0)
     {
-        wcout << "Error: an incorrect response was received from the Logger." << endl;
+        if (showOutput)
+            wcout << "Error: an incorrect response was received from the Logger." << endl;
     }
 
     return false;
@@ -261,13 +271,13 @@ bool GetResponseHeader(HANDLE hSerial)
     Gets a checksum byte from the Logger, and verifies it matches the passed-in checksum value.
     Returns true if successful, false if an error occurred.
 */
-bool VerifyChecksum(HANDLE hSerial, unsigned char checksum)
+bool VerifyChecksum(HANDLE hSerial, unsigned char checksum, bool showOutput)
 {
     char szBuff[2] = {0};
     unsigned char dummy = 0;
     
     // read the checksum byte
-    if (GetBytes(hSerial, szBuff, 1, dummy))
+    if (GetBytes(hSerial, szBuff, 1, dummy, showOutput))
     {
         return (unsigned char)szBuff[0] == checksum;
     }
@@ -277,27 +287,80 @@ bool VerifyChecksum(HANDLE hSerial, unsigned char checksum)
 
 /* 
     GetFirmwareVersion
-    Get the firmware version number from the Logger, and print it to the console
+    Get the firmware version number from the Logger, and optionally print it to the console
+    Returns true if successful, false if an error occurred.
 */
-void GetFirmwareVersion(HANDLE hSerial)
+bool GetFirmwareVersion(HANDLE hSerial, bool showOutput)
 {
     if (!SendCommand(hSerial, CMD_VERSION))
-        return;
+        return false;
 
-    if (!GetResponseHeader(hSerial))
-        return;
+    if (!GetResponseHeader(hSerial, showOutput))
+        return false;
 
     // get the version string
-    char szBuff[11] = {0};
+    char szBuff[32] = {0};
     unsigned char checksum = 0;
-    if (!GetBytes(hSerial, szBuff, 10, checksum))
-        return;
+    char* p = szBuff;
 
-    if (VerifyChecksum(hSerial, checksum))
+    do
     {
-        szBuff[10] = 0;
-        wcout << "The Logger's firmware version number is " << szBuff << endl;
+        if (!GetBytes(hSerial, p, 1, checksum, showOutput))
+            return false;
+    } while (*p++ != 0);
+
+    if (VerifyChecksum(hSerial, checksum, showOutput))
+    {
+        if (showOutput)
+            wcout << "The Logger's firmware version number is " << szBuff << endl;
+        return true;
     }
+
+    return false;
+}
+
+/* 
+    AdjustBitRate
+    Silently attempts to retrieve the firmware version number using several different bit
+    rates. The bitRate parameter (passed by reference) is set to the selected bit rate.
+    Returns true if successful, false if an error occurred.
+*/
+bool AdjustBitRate(HANDLE& hSerial, _TCHAR* portName, unsigned long& bitRate)
+{
+    unsigned long defaultRate = bitRate;
+    
+    // try the default rate first
+    if (GetFirmwareVersion(hSerial, false))
+        return true;
+
+    CloseHandle(hSerial);
+
+    unsigned long alternateRates[6] = { 38000, 38800, 37600, 39200, 37200, 39600 };
+    for (int i=0; i<6; i++)
+    {
+        bitRate = alternateRates[i];
+        if (hSerial = InitSerialPort(portName, bitRate))
+        {
+            if (GetFirmwareVersion(hSerial, false))
+            {
+                wcout << "Adjusted the communication bit rate to  " << bitRate << endl;
+                return true;
+            }
+            else
+            {
+                CloseHandle(hSerial);
+            }
+        }
+    }
+
+    // try the default rate once more, with error messages enabled
+    bitRate = defaultRate;
+    hSerial = InitSerialPort(portName, bitRate);
+    if (GetFirmwareVersion(hSerial, true))
+        return true;
+
+    CloseHandle(hSerial);
+    return false;
 }
 
 /* 
@@ -359,13 +422,13 @@ void GetGraphs(HANDLE hSerial, _TCHAR* filename, bool saveAsCSV)
     if (!SendCommand(hSerial, CMD_GETGRAPHS))
         return;
 
-    if (!GetResponseHeader(hSerial))
+    if (!GetResponseHeader(hSerial, true))
         return;
 
     // get the graph data header
     char header[10] = {0};
     unsigned char checksum = 0;
-    if (!GetBytes(hSerial, header, 9, checksum))
+    if (!GetBytes(hSerial, header, 9, checksum, true))
         return;
 
     unsigned char versionNumber = (unsigned char)header[0];
@@ -396,10 +459,10 @@ void GetGraphs(HANDLE hSerial, _TCHAR* filename, bool saveAsCSV)
         return;
     }
 
-    if (!GetBytes(hSerial, (char*)pGraphData, graphDataBytes, checksum))
+    if (!GetBytes(hSerial, (char*)pGraphData, graphDataBytes, checksum, true))
         return;
 
-    if (VerifyChecksum(hSerial, checksum))
+    if (VerifyChecksum(hSerial, checksum, true))
     {
         // save the data to the file
         HANDLE hFile = CreateFile(filename,
@@ -525,13 +588,13 @@ void GetSnapshots(HANDLE hSerial, _TCHAR* filename, bool saveAsCSV)
     if (!SendCommand(hSerial, CMD_GETSNAPSHOTS))
         return;
 
-    if (!GetResponseHeader(hSerial))
+    if (!GetResponseHeader(hSerial, true))
         return;
 
     // get the snapshot data header
     char header[3] = {0};
     unsigned char checksum = 0;
-    if (!GetBytes(hSerial, header, 2, checksum))
+    if (!GetBytes(hSerial, header, 2, checksum, true))
         return;
 
     unsigned char versionNumber = (unsigned char)header[0];
@@ -552,10 +615,10 @@ void GetSnapshots(HANDLE hSerial, _TCHAR* filename, bool saveAsCSV)
         return;
     }
 
-    if (!GetBytes(hSerial, (char*)pSnapshotData, snapshotDataBytes, checksum))
+    if (!GetBytes(hSerial, (char*)pSnapshotData, snapshotDataBytes, checksum, true))
         return;
 
-    if (VerifyChecksum(hSerial, checksum))
+    if (VerifyChecksum(hSerial, checksum, true))
     {
         // save the data to the file
         HANDLE hFile = CreateFile(filename,
