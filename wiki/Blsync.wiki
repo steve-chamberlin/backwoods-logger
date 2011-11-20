@@ -1,6 +1,8 @@
 #summary Backwoods Logger sync utility and adapter.
 #labels Featured
 
+http://www.bigmessowires.com/blsync.png
+
 = Introduction =
 
 The blsync utility is a command-line program used to transfer data from a Logger to a PC. The blsync adapter is a hardware module that plugs into the Logger's ISP port, and converts it to a 6-pin serial connector.
