@@ -138,10 +138,11 @@ void SerialDispatchCommand(uint8_t cmd)
 	switch (cmd)
 	{
 		case CMD_VERSION: // version
-			for (uint8_t i=0; i<10; i++)
-			{
-				SerialSendByte(versionStr[i]);
+			for (PGM_P p = versionStr; pgm_read_byte(p) != 0; p++)
+			{				
+				SerialSendByte(pgm_read_byte(p));
 			}
+			SerialSendByte(0);
 			break;
 		
 		case CMD_GETGRAPHS:

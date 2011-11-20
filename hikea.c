@@ -99,7 +99,7 @@ volatile uint8_t unlockState = 0;
 // main screen
 
 // system screen	
-const char versionStr[] PROGMEM = "1.0.2";
+const char versionStr[] PROGMEM = "1.0.3";
 
 volatile uint8_t setting_second;
 volatile uint8_t setting_minute;
