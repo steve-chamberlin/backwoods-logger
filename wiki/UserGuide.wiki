@@ -11,10 +11,10 @@ The Logger is an open hardware project, based upon a Bosch BMP085 temperature / 
 = Features =
  * Temperature measurements in 0.5 degree steps, from -10F to 117.5F
  * Air pressure measurements in 0.01 in-Hg steps, from 5.9 to 36.12 in-Hg
- * Altitude (calculated from air pressure) measurements in 2 ft steps, from -1384 ft to 14999 ft
- * Can configure units in degrees C, millibars, and meters through software modification
+ * Altitude (calculated from air pressure) measurements in 2 ft steps, from -1384 ft to 14999 ft 
  * Graphs of temperature, pressure, and altitude over time
  * Three graph time scales: past 2 hours, past 10 hours, past 2.5 days
+ * Imperial or metric units option
  * Current rate of ascent/descent
  * Estimated time of arrival at a user-defined altitude
  * Weather forecast
@@ -24,6 +24,7 @@ The Logger is an open hardware project, based upon a Bosch BMP085 temperature / 
  * Battery voltage indicator
  * Sound on/off control
  * 3 to 6 month battery life, depending on usage
+ * Download graph data to your PC using the optional [Blsync] adapter 
 
 = Power =
 The Backwoods Logger is an always-on device, recording a new data measurement every minute. There is no on-off switch. The device sleeps between each sample to conserve power, and battery life is 3 to 6 months.
@@ -64,6 +65,7 @@ The System Screen displays a variety of Logger diagnostic data, and the screen's
 
 Access the menu by pressing *SELECT*. The System menu options are:
 
+ * Units - metric (Celsius, meters, millibars) or imperial (Farenheit, feet, inches of mercury) 
  * Date and time - set the current date/time
  * Sleep delay - configure the inactivity delay before the Logger auto-locks 
  * Sound - turn UI feedback and alarm sounds on and off
