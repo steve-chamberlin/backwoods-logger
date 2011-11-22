@@ -114,6 +114,8 @@ Press the *SELECT* button to enter the graph menu. The menu options are:
 
 The BLsync utility is a Windows command-line program used to transfer data from a Logger to a PC, using the optional BLsync adapter along with an FTDI USB-to-serial converter such as http://www.sparkfun.com/products/9717. 
 
+The latest version of the BLsync utility program is included with each Backwoods Logger software release, and can be downloaded from http://code.google.com/p/backwoods-logger/downloads/list. 
+
 Plug the blsync adapter into the Logger's ISP port, and connect the USB-to-serial converter to the blsync adapter's 6-pin header. Be careful not to insert either one backwards, or you may damage the Logger. When connected correctly, the blsync adapter should extend out and away from the Logger, and should not overlap the Logger or battery.
 
 Open a command prompt window, and run the blsync.exe program. Under Windows, a command prompt can be opened by:
