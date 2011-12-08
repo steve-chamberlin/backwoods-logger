@@ -23,6 +23,8 @@
 
 #include "hikea.h"
 #include "avrsensors.h"
+#include "config.h"
+
 
 #ifdef NOKIA_LCD
 #include "noklcd.h"
@@ -99,7 +101,7 @@ volatile uint8_t unlockState = 0;
 // main screen
 
 // system screen	
-const char versionStr[] PROGMEM = "1.0.3";
+const char versionStr[] PROGMEM = "1.0.4";
 
 volatile uint8_t setting_second;
 volatile uint8_t setting_minute;
@@ -213,6 +215,12 @@ enum {
 #ifdef SHAKE_SENSOR
 	MENU_DATA_TRIP_TIME,
 #endif	
+#ifdef TRACK_DAILYHIGHLOW
+	MENU_DATA_TEMP_DAILYHIGHLOW,
+	MENU_DATA_PRESSURE_DAILYHIGHLOW,
+	MENU_DATA_ALTITUDE_DAILYHIGHLOW,
+#endif
+
 	MENU_DATA_EMPTY
 };
 
@@ -231,12 +239,21 @@ const char data12[] PROGMEM = "Empty";
 #ifdef SHAKE_SENSOR
 const char data13[] PROGMEM = "Trip Time";
 #endif
+#ifdef TRACK_DAILYHIGHLOW
+const char data14[] PROGMEM = "Temp Daily High/Low";
+const char data15[] PROGMEM = "Press Daily High/Low";
+const char data16[] PROGMEM = "Alt Daily High/Low";
+#endif
+
 
 const char* dataMenu[] PROGMEM = { 
 	exitMenu, data1, data2, data3, data4, data5, data6, data7, data8, data9, data10, data11, 
 #ifdef SHAKE_SENSOR
 	data13,
 #endif	
+#ifdef TRACK_DAILYHIGHLOW
+	data14, data15, data16,
+#endif
 	data12, NULL 
 };
 
@@ -320,6 +337,13 @@ char* enterNumberPrompt;
 char* choicePrompt;
 char* choice1;
 char* choice2;
+
+
+void LcdUtil_ClearLine( uint8_t row, uint8_t ch );
+void LcdUtil_ShowMainScreenData( uint8_t row, uint8_t type, uint8_t line_len, uint8_t half_char, uint8_t tiny );
+
+
+
 	
 void DrawMenu()
 {
@@ -363,11 +387,7 @@ void DrawMenu()
 			}
 		}
 						
-		LcdGoto(0, i+1);
-		for (uint8_t j=0; j<LCD_WIDTH; j++)
-		{
-			LcdWrite(LCD_DATA, topMenuItemIndex+i == selectedMenuItemIndex ? 0x7F : 0x00);
-		}
+		LcdUtil_ClearLine( i+1, topMenuItemIndex+i == selectedMenuItemIndex ? 0x7F : 0x00 );
 		
 		LcdGoto(4, i+1);
 		char str[22];
@@ -1081,6 +1101,10 @@ int main(void)
 	ClockInit();
 	SamplingInit(0);
 	
+#if TRACK_DAILYHIGHLOW
+	ResetHighLow();
+#endif	
+
 	SpeakerInit();
 	SerialInit();
 	InitSettings();
@@ -1163,6 +1187,20 @@ int main(void)
 			ShakeUpdate();
 		}
 #endif	
+
+#if TRACK_DAILYHIGHLOW
+		// Check for a new day once per minute so we can reset the daily high/low
+		{
+			static uint8_t prev_today = 0;
+			uint8_t today = clock_day;
+			if( prev_today != today )
+			{
+				prev_today = today;
+				ResetHighLow();
+			}
+		}
+#endif	
+
 		
 		// take new sample
 		if (newSampleNeeded || snapshotNeeded)
@@ -1224,7 +1262,7 @@ int main(void)
 			{
 				set_sleep_mode(SLEEP_MODE_PWR_SAVE);
 				sleep_mode();		
-			}				
+			}	
 		}			
 	}
 }
@@ -1413,6 +1451,51 @@ void MakeDataString(char* str, uint8_t dataType)
 			strcpy_P(str, PSTR("Station Prs "));
 			MakeSampleValueAndUnitsString(&str[strlen(str)], GRAPH_PRESSURE, (last_pressure + 25) / 50);			
 			break;
+			
+		#if TRACK_DAILYHIGHLOW
+			case MENU_DATA_TEMP_DAILYHIGHLOW:
+				{
+					Sample oHigh, oLow;
+					int16_t h, l;
+					
+					GetHighLow( &oHigh, &oLow );
+					h = SAMPLE_TO_TEMPERATURE(oHigh.temperature);
+					l = SAMPLE_TO_TEMPERATURE(oLow.temperature);
+								
+					MakeSampleValueAndUnitsString( str, GRAPH_TEMPERATURE, l );			
+					strcpy_P( &str[strlen(str)], PSTR(" / "));
+					MakeSampleValueAndUnitsString( &str[strlen(str)], GRAPH_TEMPERATURE, h );			
+				}
+				break;
+			case MENU_DATA_PRESSURE_DAILYHIGHLOW:
+				{
+					Sample oHigh, oLow;
+					int16_t h, l;
+
+					GetHighLow( &oHigh, &oLow );
+					h = SAMPLE_TO_PRESSURE(oHigh.pressure);
+					l = SAMPLE_TO_PRESSURE(oLow.pressure);
+
+					MakeSampleValueAndUnitsString( str, GRAPH_PRESSURE, l );			
+					strcpy_P( &str[strlen(str)], PSTR(" / "));
+					MakeSampleValueAndUnitsString( &str[strlen(str)], GRAPH_PRESSURE, h );			
+				}
+				break;
+			case MENU_DATA_ALTITUDE_DAILYHIGHLOW:
+				{
+					Sample oHigh, oLow;
+					int16_t h, l;
+
+					GetHighLow( &oHigh, &oLow );
+					h = SAMPLE_TO_ALTITUDE(oHigh.altitude);
+					l = SAMPLE_TO_ALTITUDE(oLow.altitude);
+
+					MakeSampleValueAndUnitsString( str, GRAPH_ALTITUDE, l );			
+					strcpy_P( &str[strlen(str)], PSTR(" / "));
+					MakeSampleValueAndUnitsString( &str[strlen(str)], GRAPH_ALTITUDE, h );			
+				}
+				break;
+		#endif	
 			
 		case MENU_DATA_PRESSURE_SEALEVEL:
 		{
@@ -1794,33 +1877,127 @@ void HandleSnapshotsSelect()
 	screenClearNeeded = 1;
 }
 
+/*
+ * Clear a display line to a given character.  Character can be a
+ * character-set character or an arbitrary bitmap value to set/clear
+ * the desired pixels
+ */
+void LcdUtil_ClearLine( uint8_t row, uint8_t ch )
+{
+	LcdGoto(0,row);
+	for (uint8_t j=0; j<LCD_WIDTH; j++)
+	{
+		LcdWrite(LCD_DATA, ch );
+	}	
+}
+void LcdUtil_ShowMainScreenData( uint8_t row, uint8_t type, uint8_t line_len, uint8_t half_char, uint8_t tiny )
+{
+	char str[32] = {0};
+	
+	MakeDataString(str, type);
+	LcdUtil_ClearLine( row, 0x00 );
+	
+	LcdGoto(half_char * (line_len-strlen(str)), row);
+	if( tiny )
+	{
+		LcdTinyString( str, TEXT_NORMAL );		
+	}else
+	{
+		LcdString(str);		
+	}
+}
+
+#if LOCKSCREEN_DATA_DISPLAY
+/*
+ * Currently the values to be displayed are hard coded.  In the future
+ * it would be nice to have a setup screen so they can be selected
+ * much like there is for the values shown on the "main" screen.
+ */
+void CurrentDataLockScreen()
+{
+	char str[22];
+
+#ifdef NOKIA_LCD					
+	const uint8_t cTopLineLen = 14;
+	const uint8_t cTopLineHalfChar = 3;
+#endif
+#ifdef SSD1306_LCD
+	const uint8_t cTopLineLen = 21;
+	const uint8_t cTopLineHalfChar = 3;
+#endif
+				
+	LcdUtil_ShowMainScreenData( 0, MENU_DATA_TIME_OF_DAY, cTopLineLen, cTopLineHalfChar, 0 );
+
+	LcdUtil_ShowMainScreenData( 2, MENU_DATA_TEMP, cTopLineLen, cTopLineHalfChar, 0 );
+
+	#ifdef TRACK_DAILYHIGHLOW
+		LcdUtil_ShowMainScreenData( 3, MENU_DATA_TEMP_DAILYHIGHLOW, cTopLineLen, cTopLineHalfChar, 0 );
+	#endif
+
+	LcdUtil_ShowMainScreenData( 4, MENU_DATA_TEMP_TREND, cTopLineLen, cTopLineHalfChar, 0 );
+
+	// Draw a separator line
+	LcdUtil_ClearLine( 5, 0x08 );
+
+	LcdGoto(0,6);
+	strcpy_P(str, PSTR(" hold PREV and NEXT"));
+	LcdTinyString(str, TEXT_NORMAL);
+
+	LcdGoto(0,7);
+	strcpy_P(str, PSTR("      to unlock"));
+	LcdTinyString(str, TEXT_NORMAL);	
+}
+#endif
+
+/* 
+ * This functionality pulled out of DrawModeScreen() so it could
+ * be used from multiple branches with the LOCKSCREEN_DATA_DISPLAY mod
+ */
+void LogoLockScreen()
+{
+	char str[22];
+	
+#ifdef SSD1306_LCD	
+	uint16_t logoBytes = 128*6;
+	uint8_t topRow = 6;
+#endif
+#ifdef NOKIA_LCD	
+	uint16_t logoBytes = 84*4;
+	uint8_t topRow = 4;
+#endif
+
+	LcdGoto(0,0);
+	for (int i=0; i<logoBytes; i++)
+	{
+		LcdWrite(LCD_DATA, pgm_read_byte(&logo[i]));
+	}
+		
+	LcdGoto(0,topRow);
+	strcpy_P(str, PSTR(" hold PREV and NEXT"));
+	LcdTinyString(str, TEXT_NORMAL);
+	LcdGoto(0,topRow+1);
+	strcpy_P(str, PSTR("      to unlock"));
+	LcdTinyString(str, TEXT_NORMAL);	
+};
+
+
 void DrawModeScreen()
 {
 	char str[22];
 	
 	if (unlockState != 0)
 	{
-#ifdef SSD1306_LCD	
-		uint16_t logoBytes = 128*6;
-		uint8_t topRow = 6;
-#endif
-#ifdef NOKIA_LCD	
-		uint16_t logoBytes = 84*4;
-		uint8_t topRow = 4;
-#endif
-
-		LcdGoto(0,0);
-		for (int i=0; i<logoBytes; i++)
-		{
-			LcdWrite(LCD_DATA, pgm_read_byte(&logo[i]));
-		}
-		
-		LcdGoto(0,topRow);
-		strcpy_P(str, PSTR(" hold PREV and NEXT"));
-		LcdTinyString(str, TEXT_NORMAL);
-		LcdGoto(0,topRow+1);
-		strcpy_P(str, PSTR("      to unlock"));
-		LcdTinyString(str, TEXT_NORMAL);	
+		// jjlash@gmail.com, 12/7/2011
+		// The CurrentDataLockScreen mod should work just fine
+		// on a Logger Classic but the screen size is different from
+		// the Mini so the data layout will need to be adjusted.  I 
+		// dont have a Classic available to test a new layout so 
+		// it seemed a better choice to not allow it
+		#if defined( LOGGER_MINI ) && (1 == LOCKSCREEN_DATA_DISPLAY)
+			CurrentDataLockScreen();
+		#else
+			LogoLockScreen();
+		#endif
 	}
 	else if (mode == MODE_CURRENT_DATA)
 	{					
@@ -1841,30 +2018,12 @@ void DrawModeScreen()
 				
 			for (uint8_t i=0; i<2; i++)
 			{
-				MakeDataString(str, mainScreenDataType[i]);
-				str[cTopLineLen] = 0;
-				LcdGoto(0,i);
-				for (uint8_t j=0; j<LCD_WIDTH; j++)
-				{
-					LcdWrite(LCD_DATA, 0x00);
-					
-				}
-				LcdGoto(cTopLineHalfChar*(cTopLineLen-strlen(str)),i);
-				LcdString(str);
+				LcdUtil_ShowMainScreenData( i, mainScreenDataType[i], cTopLineLen, cTopLineHalfChar, 0 );
 			}
 			
 			for (uint8_t i=2; i<6; i++)
 			{
-				MakeDataString(str, mainScreenDataType[i]);
-				str[cBottomLineLen] = 0;
-				LcdGoto(0,i);
-				for (uint8_t j=0; j<LCD_WIDTH; j++)
-				{
-					LcdWrite(LCD_DATA, 0x00);
-					
-				}
-				LcdGoto(cBottomLineHalfChar*(cBottomLineLen-strlen(str)),i);
-				LcdTinyString(str, TEXT_NORMAL);				
+				LcdUtil_ShowMainScreenData( i, mainScreenDataType[i], cBottomLineLen, cBottomLineHalfChar, 1 );
 			}
 		}
 		else
@@ -2198,11 +2357,8 @@ void DrawModeScreen()
 			LcdTinyString(str, TEXT_NORMAL);
 			LcdTinyString(" deg/h", TEXT_NORMAL);
 			
-			LcdGoto(0,3);
-			for (uint8_t j=0; j<LCD_WIDTH; j++)
-			{
-				LcdWrite(LCD_DATA, 0x00);				
-			}
+			LcdUtil_ClearLine( 3, 0x00 );
+			
 			LcdGoto(0,3);	
 			MakeDataString(str, MENU_DATA_TEMP_TREND);
 			LcdTinyString(str, TEXT_NORMAL);						
@@ -2244,11 +2400,8 @@ void DrawModeScreen()
 			LcdTinyString(str, TEXT_NORMAL);
 			LcdTinyString(" in past 1h", TEXT_NORMAL);
 
-			LcdGoto(0,3);
-			for (uint8_t i=0; i<LCD_WIDTH; i++)
-			{
-				LcdWrite(LCD_DATA, 0x00);
-			}
+			LcdUtil_ClearLine( 3, 0x00 );
+			
 			LcdGoto(0,3);
 			MakeDataString(str, MENU_DATA_PRESSURE_TREND);
 			LcdTinyString(str, TEXT_NORMAL);
@@ -2257,11 +2410,8 @@ void DrawModeScreen()
 			MakeDataString(str, MENU_DATA_PRESSURE_SEALEVEL);
 			LcdTinyString(str, TEXT_NORMAL);
 							
-			LcdGoto(0,5);
-			for (uint8_t i=0; i<LCD_WIDTH; i++)
-			{
-				LcdWrite(LCD_DATA, 0x00);
-			}
+			LcdUtil_ClearLine( 5, 0x00 );
+			
 			LcdGoto(0,5);
 			MakeDataString(str, MENU_DATA_FORECAST);
 			LcdTinyString(str, TEXT_NORMAL);					
