@@ -29,7 +29,7 @@
     </com_atmel_avrdbg_tool_simulator>
     <Language>C</Language>
     <UseGlobalToolchain>True</UseGlobalToolchain>
-    <GlobalToolchainPath>D:\Other Programs\Atmel\AVR Studio 5.0\AVR ToolChain\bin</GlobalToolchainPath>
+    <GlobalToolchainPath>C:\Program Files (x86)\Atmel\AVR Studio 5.0\AVR ToolChain\bin</GlobalToolchainPath>
     <ToolchainDirPath />
     <MakeDirPath />
   </PropertyGroup>
@@ -119,7 +119,13 @@
         <avrgcc.linker.optimization.RelaxBranches>True</avrgcc.linker.optimization.RelaxBranches>
       </AvrGcc>
     </ToolchainSettings>
-    <MemorySettings />
+    <MemorySettings>
+      <MemorySegments>
+        <InitialStack IsEnabled="0">
+          <Address>0x800</Address>
+        </InitialStack>
+      </MemorySegments>
+    </MemorySettings>
     <GenerateHexFile>True</GenerateHexFile>
     <GenerateMapFile>True</GenerateMapFile>
     <GenerateListFile>True</GenerateListFile>
@@ -175,6 +181,9 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="clock.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="config.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="glcdfont.c">
