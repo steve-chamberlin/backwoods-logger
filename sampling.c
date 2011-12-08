@@ -16,6 +16,7 @@
 #include <avr/eeprom.h>
 #include <util/atomic.h>
 #include <stdlib.h>
+#include "config.h"
 
 #include "sampling.h"
 #include "bmp085.h"
@@ -183,6 +184,76 @@ void FillSample(Sample* pSample, short temperatureRaw, long pressureRaw)
 	pSample->altitude = altitudeSample;
 }
 
+#if TRACK_DAILYHIGHLOW
+static Sample _DailyHigh;
+static Sample _DailyLow;
+void ResetHighLow()
+{
+	// Samples store data in Degrees F, Inches and Feet
+	// Sample values are unsigned bitfield vars so use 0 as the minimum and xFFFF as the maximum
+	// Set the High sample initial value to the minimum value so the first sample will be higher
+	// Set the Low sample initial value to the maximum value so the first sample will be lower
+	_DailyHigh.temperature = 0;
+	_DailyHigh.pressure = 0; 
+	_DailyHigh.altitude = 0; 
+	
+	// calculate the max based on the number of bits available to each member
+	_DailyLow.temperature = (1L<<TEMPERATURE_BITS)-1;
+	_DailyLow.pressure = (1L<<PRESSURE_BITS)-1;
+	_DailyLow.altitude = (1L<<ALTITUDE_BITS)-1;
+}
+void GetHighLow( Sample *high, Sample *low )
+{
+	if( NULL != high )
+	{
+		high->altitude = _DailyHigh.altitude;
+		high->pressure = _DailyHigh.pressure;
+		high->temperature = _DailyHigh.temperature;
+	}	
+	if( NULL != low )
+	{
+		low->altitude = _DailyLow.altitude;
+		low->pressure = _DailyLow.pressure;
+		low->temperature = _DailyLow.temperature;
+	}	
+}
+void _UpdateHighLow( Sample *newSample )
+{
+	/* 
+	 * This is a "private" function called only from StoreSample()
+	 * so we wont bother to make sure the pointer is valid
+	 */
+	if( newSample->altitude > _DailyHigh.altitude )		
+	{
+		_DailyHigh.altitude = newSample->altitude;
+	}
+	if( newSample->altitude < _DailyLow.altitude )		
+	{
+		_DailyLow.altitude = newSample->altitude;
+	}
+	
+	if( newSample->pressure > _DailyHigh.pressure )		
+	{
+		_DailyHigh.pressure = newSample->pressure;
+	}
+	if( newSample->pressure < _DailyLow.pressure )		
+	{
+		_DailyLow.pressure = newSample->pressure;
+	}
+	
+	if( newSample->temperature > _DailyHigh.temperature )		
+	{
+		_DailyHigh.temperature = newSample->temperature;
+	}
+	if( newSample->temperature < _DailyLow.temperature )		
+	{
+		_DailyLow.temperature = newSample->temperature;
+	}
+}
+
+#endif
+
+
 // store a raw sample into one or more graphs
 // temperatureRaw: tenths of degrees C
 // pressureRaw: hundredths of millibars
@@ -191,6 +262,10 @@ void StoreSample(short temperatureRaw, long pressureRaw)
 	Sample newSample;
 	
 	FillSample(&newSample, temperatureRaw, pressureRaw);
+
+	#if TRACK_DAILYHIGHLOW
+	_UpdateHighLow( &newSample );
+	#endif
 	
 	for (uint8_t i=0; i<NUM_TIME_SCALES; i++)
 	{
