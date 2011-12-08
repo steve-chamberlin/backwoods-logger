@@ -18,6 +18,7 @@
 
 #include <inttypes.h>
 #include <avr/pgmspace.h>
+#include "config.h"
 
 // temperature, in units of Farenheit * 10
 // can store -10 to 117.5F, in 0.5F steps
@@ -102,5 +103,10 @@ uint8_t GetNewestSnapshotIndex();
 Snapshot* GetSnapshot(uint8_t index);
 uint8_t GetMaxSnapshots();
 uint8_t GetNumSnapshots();
+
+#if TRACK_DAILYHIGHLOW
+void ResetHighLow();
+void GetHighLow( Sample *high, Sample *low );
+#endif
 
 #endif /* SAMPLING_H_ */
