@@ -1930,7 +1930,7 @@ void CurrentDataLockScreen()
 
 	LcdUtil_ShowMainScreenData( 2, MENU_DATA_TEMP, cTopLineLen, cTopLineHalfChar, 0 );
 
-	#ifdef TRACK_DAILYHIGHLOW
+	#if TRACK_DAILYHIGHLOW
 		LcdUtil_ShowMainScreenData( 3, MENU_DATA_TEMP_DAILYHIGHLOW, cTopLineLen, cTopLineHalfChar, 0 );
 	#endif
 
