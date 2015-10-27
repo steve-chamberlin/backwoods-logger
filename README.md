@@ -6,6 +6,8 @@
 
 The Backwoods Logger is a programmable device for measuring and graphing temperature, air pressure, and altitude. It's designed for hikers, backpackers, climbers, skiers, trail runners, cyclists, kayakers, snowmobilers, horseback riders, and other outdoorsy people interested in environmental data logging over timescales from an hour to a few weeks.
 
+Please visit the [wiki](https://github.com/steve-chamberlin/backwoods-logger/wiki) for complete details and documentation.
+
 #### Features ####
   * Graphs of temperature, pressure, and altitude over time
   * Three graph time scales: past 2 hours, past 10 hours, past 2.5 days
