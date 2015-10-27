@@ -7,8 +7,7 @@ www.bigmessowires.com
 
 DOCUMENTATION
   
-The Backwoods Logger is an open source, open hardware project. See the project homepage at http://code.google.com/p/backwoods-logger/
-for the latest assembly instructions, the parts list, programmer's guide, and user manual.
+The Backwoods Logger is an open source, open hardware project. See the project homepage at http://github.com/steve-chamberlin/backwoods-logger for the latest assembly instructions, the parts list, programmer's guide, and user manual.
 
 DISCUSSION
 
@@ -17,6 +16,4 @@ Join the Backwoods Logger public discussion mailing list at http://groups.google
 
 LICENSING
 
-The Backwoods Logger software is offered under the MIT license, whose terms appear in the source code files. The Backwoods Logger
-schematics, board layout files, Gerber files, and other content files are offered under the Creative Commons Attribution 3.0 license
-(CC BY 3.0), whose terms can be viewed at http://creativecommons.org/licenses/by/3.0/.  
+The Backwoods Logger software is offered under the MIT license, whose terms appear in the source code files. The Backwoods Logger schematics, board layout files, Gerber files, and other content files are offered under the Creative Commons Attribution 3.0 license (CC BY 3.0), whose terms can be viewed at http://creativecommons.org/licenses/by/3.0/.  
