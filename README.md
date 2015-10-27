@@ -1,4 +1,8 @@
-![![](http://www.bigmessowires.com/lm_triptime_150.jpg)](http://www.bigmessowires.com/lm_triptime.jpg) ![![](http://www.bigmessowires.com/lm_graph_150.jpg)](http://www.bigmessowires.com/lm_graph.jpg) ![![](http://www.bigmessowires.com/logger_langley5_150.jpg)](http://www.bigmessowires.com/logger_langley5.jpg) ![![](http://www.bigmessowires.com/logger_menu_150.jpg)](http://www.bigmessowires.com/logger_menu.jpg) ![![](http://www.bigmessowires.com/logger_graph_150.jpg)](http://www.bigmessowires.com/logger_graph.jpg)
+![](http://www.bigmessowires.com/lm_triptime_150.jpg) 
+![](http://www.bigmessowires.com/lm_graph_150.jpg) 
+![](http://www.bigmessowires.com/logger_langley5_150.jpg)
+![](http://www.bigmessowires.com/logger_menu_150.jpg)
+![](http://www.bigmessowires.com/logger_graph_150.jpg)
 
 The Backwoods Logger is a programmable device for measuring and graphing temperature, air pressure, and altitude. It's designed for hikers, backpackers, climbers, skiers, trail runners, cyclists, kayakers, snowmobilers, horseback riders, and other outdoorsy people interested in environmental data logging over timescales from an hour to a few weeks.
 
