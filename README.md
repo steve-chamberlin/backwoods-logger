@@ -22,9 +22,9 @@ The Backwoods Logger is a programmable device for measuring and graphing tempera
   * Temperature measurements in 0.5 degree steps, from -10F to 117.5F (-23C to 48C)
   * Air pressure measurements in 0.01 in-Hg steps, from 5.9 to 36.12 in-Hg (170 to 1250 millibars)
   * Altitude (calculated from air pressure) measurements in 2 ft steps, from -1384 ft to 14999 ft (-300 to 4500 meters)
-  * Download graph data to your PC using the optional [Blsync](Blsync.md) adapter
+  * Download graph data to your PC using the optional [Blsync](https://github.com/steve-chamberlin/backwoods-logger/wiki/BLsync) adapter
 
-Don't see the feature you want? Join the project and help create it! Also check out the list of [development ideas](DevelopmentNeeds.md) for suggestions on where you could help out.
+Don't see the feature you want? Join the project and help create it! Also check out the list of [development ideas](https://github.com/steve-chamberlin/backwoods-logger/wiki/DevelopmentNeeds) for suggestions on where you could help out.
 
 Two versions of the Backwoods Logger design are available:
 
@@ -47,10 +47,10 @@ Both versions of the Backwoods Logger use the Atmel ATmega328P microcontroller a
 The Backwoods Logger was originally developed as a [Big Mess o' Wires](http://www.bigmessowires.com) project.
 
 #### Building the Logger ####
-Because the Backwoods Logger is an open hardware project, you can build one yourself using the plans provided here. See the [assembly instructions](AssemblyInstructions.md) for more details.
+Because the Backwoods Logger is an open hardware project, you can build one yourself using the plans provided here. See the [assembly instructions](https://github.com/steve-chamberlin/backwoods-logger/wiki/AssemblyInstructions) for more details.
 
 #### Buying a Logger ####
-Don't want to build your own? [Steve Chamberlin](mailto:steve@bigmessowires.com) made a small production run of Backwoods Logger Mini units and [Blsync](Blsync.md) adapter boards, and is offering them for sale. The price is $59 for an assembled Logger Mini, and $6 for an assembled blsync adapter. Contact Steve for more details or to make a purchase.
+Don't want to build your own? [Steve Chamberlin](mailto:steve@bigmessowires.com) made a small production run of Backwoods Logger Mini units and [BLsync](https://github.com/steve-chamberlin/backwoods-logger/wiki/BLsync) adapter boards, and is offering them for sale. The price is $49 for an assembled Logger Mini, and $6 for an assembled blsync adapter. Contact Steve for more details or to make a purchase.
 
 Need a PCB? Steve is also selling bare Logger Mini PCBs for $3.
 
